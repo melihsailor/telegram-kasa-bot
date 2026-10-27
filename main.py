@@ -9,7 +9,7 @@ from telegram.ext import Application, CommandHandler, ContextTypes
 flask_app = Flask(__name__)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8886446926:AAFUBRKk6qDUvQi1dsneaFQXkUIKBz-sGgg")
-WEB_APP_URL = "https://kasa-hesaplayici.onrender.com"
+WEB_APP_URL = "https://telegram-kasa-bot.onrender.com"
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "")
 
 telegram_app = Application.builder().token(BOT_TOKEN).build()
