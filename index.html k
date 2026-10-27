@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Surebet Arbitraj Kasa Takip Pro</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #3b82f6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        body.theme-cyber {
+            --bg-color: #050505;
+            --card-bg: #121212;
+            --accent: #00f0ff;
+            --text-main: #ffffff;
+            --text-muted: #777777;
+        }
+        body.theme-gold {
+            --bg-color: #14110c;
+            --card-bg: #211c15;
+            --accent: #eab308;
+            --text-main: #fef08a;
+            --text-muted: #a1a1aa;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .card { background-color: var(--card-bg); }
+        .accent-bg { background-color: var(--accent); }
+        .accent-text { color: var(--accent); }
+        .accent-border { border-color: var(--accent); }
+    </style>
+</head>
+<body class="pb-24">
+
+    <!-- Üst Bar -->
+    <header class="p-4 flex items-center justify-between border-b border-slate-800 card sticky top-0 z-30">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl">⚡</span>
+            <div>
+                <h1 class="font-bold text-base leading-tight">Surebet Tracker</h1>
+                <p class="text-xs text-slate-400">Arbitraj Kasa Yönetimi</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="openModal('kzModal')" class="bg-indigo-600/30 text-indigo-400 border border-indigo-500/30 px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 active:scale-95 transition">
+                <span>📊</span> K/Z Raporu
+            </button>
+            <button onclick="exportToCSV()" class="bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1 active:scale-95 transition">
+                <span>📥</span> Excel
+            </button>
+        </div>
+    </header>
+
+    <main class="p-4 max-w-lg mx-auto space-y-5">
+
+        <!-- Kasa Kartı -->
+        <div onclick="openModal('balanceModal')" class="card p-5 rounded-2xl border border-slate-800 shadow-xl cursor-pointer hover:border-slate-700 transition relative overflow-hidden group">
+            <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-blue-500/10 rounded-full blur-xl group-hover:bg-blue-500/20 transition"></div>
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-xs font-medium text-slate-400 flex items-center gap-1">
+                    🟢 Toplam Kasa Bakiyesi <span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-slate-300">Düzenlemek için tıkla</span>
+                </span>
+                <span id="currencySymbol" class="text-xs font-bold text-slate-400">₺ TRY</span>
+            </div>
+            <div class="flex items-baseline gap-2">
+                <span id="totalBalance" class="text-3xl font-extrabold tracking-tight">0.00</span>
+                <span id="currencyBadge" class="text-sm font-semibold text-slate-400">TRY</span>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-slate-800/80 text-center">
+                <div>
+                    <div class="text-[10px] text-slate-400">Başlangıç</div>
+                    <div id="initialBalance" class="text-xs font-bold text-slate-300">0.00</div>
+                </div>
+                <div>
+                    <div class="text-[10px] text-slate-400">Bekleyen Risk</div>
+                    <div id="pendingRisk" class="text-xs font-bold text-amber-400">0.00</div>
+                </div>
+                <div>
+                    <div class="text-[10px] text-slate-400">Net Kâr/Zarar</div>
+                    <div id="totalPnL" class="text-xs font-bold text-emerald-400">0.00</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sekme Değiştirici -->
+        <div class="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-xs font-medium">
+            <button onclick="switchTab('bets')" id="tab-bets" class="flex-1 py-2 rounded-lg text-center font-semibold bg-blue-600 text-white transition">Arbitrajlar</button>
+            <button onclick="switchTab('calc')" id="tab-calc" class="flex-1 py-2 rounded-lg text-center text-slate-400 transition">Surebet Hesapla</button>
+            <button onclick="switchTab('settings')" id="tab-settings" class="flex-1 py-2 rounded-lg text-center text-slate-400 transition">Özelleştir</button>
+        </div>
+
+        <!-- SEKME 1 -->
+        <div id="sec-bets" class="space-y-4">
+            <div class="flex items-center justify-between">
+                <div class="flex gap-2 text-xs">
+                    <button onclick="filterBets('all')" id="filter-all" class="px-3 py-1 rounded-full bg-slate-800 text-white font-semibold">Tümü</button>
+                    <button onclick="filterBets('pending')" id="filter-pending" class="px-3 py-1 rounded-full bg-slate-800/50 text-slate-400">Bekleyenler</button>
+                    <button onclick="filterBets('settled')" id="filter-settled" class="px-3 py-1 rounded-full bg-slate-800/50 text-slate-400">Sonuçlananlar</button>
+                </div>
+                <button onclick="openModal('addBetModal')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1 active:scale-95 transition">
+                    <span>+</span> Manuel Arbitraj
+                </button>
+            </div>
+            <div id="betsList" class="space-y-3"></div>
+        </div>
+
+        <!-- SEKME 2 -->
+        <div id="sec-calc" class="hidden space-y-4">
+            <div class="card p-4 rounded-xl border border-slate-800 space-y-3">
+                <h3 class="text-sm font-bold flex items-center justify-between">
+                    <span>⚡ 2 Yönlü Surebet Hesaplayıcı</span>
+                    <span id="surebetProfitBadge" class="text-xs px-2 py-0.5 rounded bg-slate-800 font-mono">0.00%</span>
+                </h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] text-slate-400 mb-1 block">1. Büro Oranı</label>
+                        <input type="number" id="calcOdds1" step="0.01" value="2.10" oninput="calculateSurebet()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-slate-400 mb-1 block">2. Büro Oranı</label>
+                        <input type="number" id="calcOdds2" step="0.01" value="2.05" oninput="calculateSurebet()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[11px] text-slate-400 mb-1 block">Toplam Yatırılacak Bütçe (Stake)</label>
+                    <input type="number" id="calcTotalStake" value="1000" oninput="calculateSurebet()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="p-3 bg-slate-900/90 rounded-lg border border-slate-800/80 space-y-2 text-xs">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Büro 1 Stake:</span>
+                        <span id="resStake1" class="font-bold text-white">0.00 TRY</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400">Büro 2 Stake:</span>
+                        <span id="resStake2" class="font-bold text-white">0.00 TRY</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-2 border-t border-slate-800">
+                        <span class="text-slate-300 font-semibold">Garanti Net Kâr:</span>
+                        <span id="resNetProfit" class="font-extrabold text-emerald-400">0.00 TRY</span>
+                    </div>
+                </div>
+                <button onclick="addSurebetToPending()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-lg transition active:scale-95 flex items-center justify-center gap-2">
+                    <span>📌</span> Bu Arbitrajı Bekleyen Bahislere Ekle
+                </button>
+            </div>
+        </div>
+
+        <!-- SEKME 3 -->
+        <div id="sec-settings" class="hidden space-y-4">
+            <div class="card p-4 rounded-xl border border-slate-800 space-y-4">
+                <h3 class="text-sm font-bold">⚙️ Uygulama Ayarları</h3>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Para Birimi</label>
+                    <select id="currencySelect" onchange="changeCurrency(this.value)" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-white">
+                        <option value="TRY">₺ TRY - Türk Lirası</option>
+                        <option value="USD">$ USD - Amerikan Doları</option>
+                        <option value="EUR">€ EUR - Euro</option>
+                        <option value="USDT">₮ USDT - Tether</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-slate-400 block mb-1">Arayüz Teması</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setTheme('default')" class="p-2 border border-slate-700 rounded-lg text-xs font-medium text-center bg-slate-900 hover:border-blue-500">Koyu Telegram</button>
+                        <button onclick="setTheme('cyber')" class="p-2 border border-slate-700 rounded-lg text-xs font-medium text-center bg-black text-cyan-400 hover:border-cyan-400">Neon Cyber</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- MODALLAR -->
+    <div id="balanceModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="card w-full max-w-md rounded-t-2xl sm:rounded-2xl p-5 border border-slate-800 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-bold text-sm">💰 Kasa Bakiyesini Düzenle</h3>
+                <button onclick="closeModal('balanceModal')" class="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <div class="space-y-3">
+                <input type="number" id="editBalanceInput" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-base font-bold text-white">
+            </div>
+            <button onclick="saveBalance()" class="w-full py-2.5 bg-blue-600 font-bold text-xs rounded-lg text-white">Kaydet</button>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) tg.expand();
+        let state = { balance: 10000, initialBalance: 10000, currency: 'TRY', bets: [], currentSettleId: null };
+        window.onload = function() { calculateSurebet(); updateUI(); };
+        function updateUI() {
+            document.getElementById('totalBalance').innerText = state.balance.toFixed(2);
+            document.getElementById('initialBalance').innerText = state.initialBalance.toFixed(2) + ' ' + state.currency;
+        }
+        function calculateSurebet() {
+            const o1 = parseFloat(document.getElementById('calcOdds1').value) || 0;
+            const o2 = parseFloat(document.getElementById('calcOdds2').value) || 0;
+            const totalStake = parseFloat(document.getElementById('calcTotalStake').value) || 0;
+            if (o1 <= 1 || o2 <= 1 || totalStake <= 0) return;
+            const arbPercent = (1/o1) + (1/o2);
+            const profitMargin = ((1 / arbPercent) - 1) * 100;
+            const stake1 = (totalStake * (1/o1)) / arbPercent;
+            const stake2 = (totalStake * (1/o2)) / arbPercent;
+            const netProfit = (stake1 * o1) - totalStake;
+            document.getElementById('resStake1').innerText = stake1.toFixed(2) + ' ' + state.currency;
+            document.getElementById('resStake2').innerText = stake2.toFixed(2) + ' ' + state.currency;
+            document.getElementById('resNetProfit').innerText = (netProfit >= 0 ? '+' : '') + netProfit.toFixed(2) + ' ' + state.currency;
+            document.getElementById('surebetProfitBadge').innerText = profitMargin.toFixed(2) + '%';
+        }
+        function switchTab(tabId) {
+            ['bets', 'calc', 'settings'].forEach(t => {
+                document.getElementById('sec-' + t).classList.add('hidden');
+                document.getElementById('tab-' + t).classList.remove('bg-blue-600', 'text-white', 'font-semibold');
+                document.getElementById('tab-' + t).classList.add('text-slate-400');
+            });
+            document.getElementById('sec-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('bg-blue-600', 'text-white', 'font-semibold');
+            document.getElementById('tab-' + tabId).classList.remove('text-slate-400');
+        }
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    </script>
+</body>
+</html>
