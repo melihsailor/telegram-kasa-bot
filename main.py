@@ -10,27 +10,27 @@ flask_app = Flask(__name__)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8886446926:AAFUBRKk6qDUvQi1dsneaFQXkUIKBz-sGgg")
 BASE_URL = "https://telegram-kasa-bot.onrender.com"
-WEB_APP_URL = f"{BASE_URL}?v=5"
+WEB_APP_URL = f"{BASE_URL}?v=6"
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "")
 
 telegram_app = Application.builder().token(BOT_TOKEN).build()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🚀 Surebet PRO v5", web_app=WebAppInfo(url=WEB_APP_URL))]
+        [InlineKeyboardButton("🚀 Surebet PRO v6 (Kalıcı Hafıza)", web_app=WebAppInfo(url=WEB_APP_URL))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await update.message.reply_text(
-        "📊 *Surebet Kasa & Arbitraj PRO v5*\n\n"
-        "Gelişmiş arayüze erişmek için aşağıdaki butona tıklayabilirsin:",
+        "📊 *Surebet Kasa & Arbitraj PRO v6*\n\n"
+        "Verilerin artık tarayıcında kalıcı olarak saklanıyor. Açmak için tıkla:",
         reply_markup=reply_markup,
         parse_mode="Markdown"
     )
 
 telegram_app.add_handler(CommandHandler("start", start))
 
-# PRO HTML & CSS & JS Arayüzü v5 (Surebet Odaklı)
+# PRO HTML & CSS & JS Arayüzü v6 (LocalStorage Kalıcı Hafıza Destekli)
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="tr" class="dark">
@@ -40,7 +40,7 @@ HTML_TEMPLATE = """
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Surebet Kasa & Arbitraj PRO v5</title>
+    <title>Surebet PRO v6</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -64,10 +64,10 @@ HTML_TEMPLATE = """
     <!-- Header -->
     <header class="p-3.5 flex items-center justify-between border theme-card rounded-2xl shadow-xl">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-sm">v5</div>
+            <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-sm">v6</div>
             <div>
                 <h1 class="font-bold text-sm tracking-wide text-white">Surebet & Arbitraj PRO</h1>
-                <p class="text-[11px] text-slate-400">Çift Büro Stake Motoru</p>
+                <p class="text-[11px] text-slate-400">Kalıcı Hafıza Aktif</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -87,7 +87,7 @@ HTML_TEMPLATE = """
         <div id="bankWithdrawAmount" class="text-sm font-black text-amber-400">₺0,00</div>
     </div>
 
-    <!-- Zaman Bazlı İstatistik Kartları (Günlük, Haftalık, Aylık) -->
+    <!-- Zaman Bazlı İstatistik Kartları -->
     <div class="grid grid-cols-3 gap-2">
         <div class="theme-card p-2.5 rounded-xl border text-center space-y-1 shadow">
             <span class="text-[10px] text-slate-400 font-bold block">GÜNLÜK KÂR</span>
@@ -150,7 +150,7 @@ HTML_TEMPLATE = """
         </div>
     </div>
 
-    <!-- Tıklanabilir Büro Bazlı Cüzdan Dağılımı -->
+    <!-- Tıklanabilir Büro Bakiyeleri -->
     <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
         <div class="flex justify-between items-center">
             <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
@@ -227,9 +227,8 @@ HTML_TEMPLATE = """
         </div>
     </div>
 
-    <!-- TAB 2: BAHİS TAKİP (ÇİFT BÜRO AYRI STAKE GİRİŞİ) -->
+    <!-- TAB 2: BAHİS TAKİP -->
     <div id="tabTrack" class="tab-content space-y-3">
-        <!-- Manuel Çapraz Bahis Ekleme Paneli -->
         <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
             <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
                 <i class="fa-solid fa-plus-circle text-blue-400"></i> Manuel Surebet Ekle (Ayrı Oran & Miktarlar)
@@ -262,7 +261,6 @@ HTML_TEMPLATE = """
             </button>
         </div>
 
-        <!-- Bekleyen Bahisler -->
         <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
             <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
                 <i class="fa-solid fa-clock"></i> Bekleyen Surebetler
@@ -270,16 +268,15 @@ HTML_TEMPLATE = """
             <div id="pendingList" class="space-y-2"></div>
         </div>
 
-        <!-- Sonuçlanan Bahisler -->
         <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
             <h3 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                <i class="fa-solid fa-check-circle"></i> Sonuçlanan Surebetler (Detay, Geri Al & Sil)
+                <i class="fa-solid fa-check-circle"></i> Sonuçlanan Surebetler
             </h3>
             <div id="settledList" class="space-y-2"></div>
         </div>
     </div>
 
-    <!-- TAB 3: ÖZELLEŞTİRME & VERİ SIFIRLAMA -->
+    <!-- TAB 3: ÖZELLEŞTİRME -->
     <div id="tabSettings" class="tab-content space-y-3">
         <div class="theme-card p-4 rounded-2xl border space-y-4 shadow-lg">
             <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
@@ -319,9 +316,567 @@ HTML_TEMPLATE = """
         </div>
     </div>
 
-    <!-- BAKİYE & HEDEF DÜZENLEME MODALI -->
+    <!-- MODALLAR -->
     <div id="balanceModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="theme-card w-full max-w-sm rounded-2xl border p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-blue-5
+                <h3 class="text-sm font-bold text-white">Kasa Parametreleri</h3>
+                <button onclick="closeBalanceModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="text-slate-400 block mb-1 font-semibold">Mevcut Toplam Kasa</label>
+                    <input type="number" id="inputBalance" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1 font-semibold">Hedef Kasa</label>
+                    <input type="number" id="inputGoal" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-slate-800">
+                <button onclick="closeBalanceModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs">İptal</button>
+                <button onclick="saveBalanceModal()" class="w-1/2 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="bookieModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="theme-card w-full max-w-sm rounded-2xl border p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white">Büro Bakiye Düzenle</h3>
+                <button onclick="closeBookieModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="text-slate-400 block mb-1 font-semibold">Büro Adı</label>
+                    <input type="text" id="inputBookieName" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1 font-semibold">Büro Bakiyesi</label>
+                    <input type="number" id="inputBookieBalance" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-slate-800">
+                <button onclick="deleteCurrentBookie()" class="w-1/3 py-2.5 rounded-xl bg-rose-600/20 text-rose-400 text-xs border border-rose-500/30">Sil</button>
+                <button onclick="saveBookieModal()" class="w-2/3 py-2.5 rounded-xl bg-blue-600 text-white text-xs font-bold">Kaydet</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settleModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="theme-card w-full max-w-sm rounded-2xl border p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white">Surebet Sonuçlandır</h3>
+                <button onclick="closeSettleModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="text-slate-400 block mb-1 font-semibold">Hangi Büro Kazandı?</label>
+                    <select id="settleResultType" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold"></select>
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1 font-semibold">Kayıp Bonusu Alındı mı?</label>
+                    <select id="bonusTakenSelect" onchange="toggleBonusInput()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                        <option value="hayir">Hayır</option>
+                        <option value="evet">Evet, Alındı</option>
+                    </select>
+                </div>
+                <div id="bonusAmountContainer" class="hidden">
+                    <label class="text-slate-400 block mb-1 font-semibold">Alınan Kayıp Bonusu Miktarı</label>
+                    <input type="number" id="inputBonusVal" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                </div>
+            </div>
+            <div class="flex gap-2 pt-2 border-t border-slate-800">
+                <button onclick="closeSettleModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 text-slate-300 text-xs">İptal</button>
+                <button onclick="confirmSettle()" class="w-1/2 py-2.5 rounded-xl bg-emerald-600 text-white text-xs font-bold">Sonuçlandır</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="detailModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="theme-card w-full max-w-sm rounded-2xl border p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white">Surebet Detayı & Yönetimi</h3>
+                <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="detailContent" class="space-y-2 text-xs text-slate-300"></div>
+            <div class="space-y-1">
+                <label class="text-[11px] text-slate-400 font-semibold block">Bahis Notu</label>
+                <textarea id="detailNoteText" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white"></textarea>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-800 text-xs">
+                <button onclick="revertSettledBet()" class="py-2 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/30 font-bold">Geri Al</button>
+                <button onclick="saveDetailNote()" class="py-2 rounded-xl bg-blue-600 text-white font-bold">Not Kaydet</button>
+                <button onclick="deleteSettledBet()" class="py-2 rounded-xl bg-rose-600/20 text-rose-400 border border-rose-500/30 font-bold">Sil</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) tg.expand();
+
+        let state = {
+            balance: 10000,
+            startBalance: 10000,
+            goal: 20000,
+            risk: 0,
+            netProfit: 0,
+            bonus: 0,
+            currency: 'TRY',
+            dailyProfit: 0,
+            weeklyProfit: 0,
+            monthlyProfit: 0
+        };
+
+        let bookies = [
+            { name: 'Bet365', balance: 5000 },
+            { name: '1xBet', balance: 5000 }
+        ];
+
+        let pendingBets = [];
+        let settledBets = [];
+
+        let currentSettleIndex = null;
+        let currentDetailIndex = null;
+        let currentBookieIndex = null;
+
+        // KALICI HAFIZA YÜKLEME (LocalStorage)
+        function loadData() {
+            const savedState = localStorage.getItem('surebet_state');
+            const savedBookies = localStorage.getItem('surebet_bookies');
+            const savedPending = localStorage.getItem('surebet_pending');
+            const savedSettled = localStorage.getItem('surebet_settled');
+
+            if (savedState) state = JSON.parse(savedState);
+            if (savedBookies) bookies = JSON.parse(savedBookies);
+            if (savedPending) pendingBets = JSON.parse(savedPending);
+            if (savedSettled) settledBets = JSON.parse(savedSettled);
+        }
+
+        function saveData() {
+            localStorage.setItem('surebet_state', JSON.stringify(state));
+            localStorage.setItem('surebet_bookies', JSON.stringify(bookies));
+            localStorage.setItem('surebet_pending', JSON.stringify(pendingBets));
+            localStorage.setItem('surebet_settled', JSON.stringify(settledBets));
+        }
+
+        function getSymbol() { 
+            if (state.currency === 'USD') return '$';
+            if (state.currency === 'EUR') return '€';
+            return '₺';
+        }
+        function fmt(num) { return getSymbol() + num.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+        function updateUI() {
+            saveData(); // Her güncellemede hafızaya kaydet
+            document.getElementById('displayBalance').innerText = fmt(state.balance);
+            document.getElementById('displayStartBal').innerText = fmt(state.startBalance);
+            document.getElementById('displayGoal').innerText = fmt(state.goal);
+            document.getElementById('displayRisk').innerText = fmt(state.risk);
+            document.getElementById('displayNetProfit').innerText = (state.netProfit >= 0 ? '+' : '') + fmt(state.netProfit);
+            document.getElementById('displayBonus').innerText = fmt(state.bonus);
+            document.getElementById('currencyBadge').innerText = `${getSymbol()} ${state.currency}`;
+
+            const progressPct = Math.min(100, Math.max(0, ((state.balance - state.startBalance) / (state.goal - state.startBalance)) * 100));
+            document.getElementById('goalProgressPct').innerText = '%' + (isNaN(progressPct) ? 0 : progressPct.toFixed(1));
+            document.getElementById('goalProgressBar').style.width = (isNaN(progressPct) ? 0 : progressPct) + '%';
+
+            const bankCut = state.dailyProfit > 0 ? state.dailyProfit * 0.10 : 0;
+            document.getElementById('bankWithdrawAmount').innerText = fmt(bankCut);
+
+            document.getElementById('statDaily').innerText = (state.dailyProfit >= 0 ? '+' : '') + fmt(state.dailyProfit);
+            document.getElementById('statWeekly').innerText = (state.weeklyProfit >= 0 ? '+' : '') + fmt(state.weeklyProfit);
+            document.getElementById('statMonthly').innerText = (state.monthlyProfit >= 0 ? '+' : '') + fmt(state.monthlyProfit);
+
+            renderBookies();
+            renderPending();
+            renderSettled();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+
+            if (tab === 'calc') { document.getElementById('tabCalc').classList.add('active'); document.getElementById('tabBtn1').classList.add('active'); }
+            else if (tab === 'track') { document.getElementById('tabTrack').classList.add('active'); document.getElementById('tabBtn2').classList.add('active'); }
+            else { document.getElementById('tabSettings').classList.add('active'); document.getElementById('tabBtn3').classList.add('active'); }
+        }
+
+        function renderBookies() {
+            const container = document.getElementById('bookiesContainer');
+            container.innerHTML = bookies.map((b, idx) => `
+                <div onclick="openBookieModal(${idx})" class="p-2.5 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center cursor-pointer hover:border-blue-500/50 transition">
+                    <span class="text-xs font-bold text-slate-300">${b.name}</span>
+                    <span class="text-xs font-black text-white">${fmt(b.balance)}</span>
+                </div>
+            `).join('');
+        }
+
+        function openBookieModal(idx) {
+            currentBookieIndex = idx;
+            document.getElementById('inputBookieName').value = bookies[idx].name;
+            document.getElementById('inputBookieBalance').value = bookies[idx].balance;
+            document.getElementById('bookieModal').classList.remove('hidden');
+        }
+        function closeBookieModal() { document.getElementById('bookieModal').classList.add('hidden'); }
+        function saveBookieModal() {
+            if (currentBookieIndex !== null) {
+                bookies[currentBookieIndex].name = document.getElementById('inputBookieName').value;
+                bookies[currentBookieIndex].balance = parseFloat(document.getElementById('inputBookieBalance').value) || 0;
+                updateBookieTotal();
+                updateUI();
+            }
+            closeBookieModal();
+        }
+        function deleteCurrentBookie() {
+            if (currentBookieIndex !== null) {
+                bookies.splice(currentBookieIndex, 1);
+                updateBookieTotal();
+                updateUI();
+            }
+            closeBookieModal();
+        }
+        function addNewBookie() {
+            bookies.push({ name: `Büro ${bookies.length + 1}`, balance: 0 });
+            openBookieModal(bookies.length - 1);
+        }
+        function updateBookieTotal() {
+            state.balance = bookies.reduce((acc, b) => acc + b.balance, 0);
+        }
+
+        function recalcArb() {
+            const b1 = document.getElementById('calcB1Name').value || '1. Büro';
+            const b2 = document.getElementById('calcB2Name').value || '2. Büro';
+            const o1 = parseFloat(document.getElementById('calcOdds1').value) || 0;
+            const o2 = parseFloat(document.getElementById('calcOdds2').value) || 0;
+            const total = parseFloat(document.getElementById('calcTotalStake').value) || 0;
+
+            document.getElementById('labelB1Stake').innerText = `${b1} Stake (Miktar):`;
+            document.getElementById('labelB2Stake').innerText = `${b2} Stake (Miktar):`;
+
+            if (o1 <= 1 || o2 <= 1 || total <= 0) return;
+
+            const arb = (1 / o1) + (1 / o2);
+            const s1 = (total * (1 / o1)) / arb;
+            const s2 = (total * (1 / o2)) / arb;
+            const profit = (s1 * o1) - total;
+            const profitPct = (profit / total) * 100;
+
+            document.getElementById('resStake1').innerText = fmt(s1);
+            document.getElementById('resStake2').innerText = fmt(s2);
+
+            const profitEl = document.getElementById('resNetProfit');
+            const statusEl = document.getElementById('arbStatus');
+
+            if (arb < 1) {
+                profitEl.className = "text-emerald-400 font-extrabold";
+                profitEl.innerText = '+' + fmt(profit) + ' (%' + profitPct.toFixed(2) + ')';
+                statusEl.className = "text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                statusEl.innerText = "Fırsat Var";
+            } else {
+                profitEl.className = "text-rose-400 font-extrabold";
+                profitEl.innerText = fmt(profit) + ' (%' + profitPct.toFixed(2) + ')';
+                statusEl.className = "text-[10px] px-2 py-0.5 rounded font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                statusEl.innerText = "Arbitraj Yok";
+            }
+        }
+
+        function addCurrentBetToPending() {
+            const b1 = document.getElementById('calcB1Name').value || '1. Büro';
+            const b2 = document.getElementById('calcB2Name').value || '2. Büro';
+            const o1 = parseFloat(document.getElementById('calcOdds1').value) || 0;
+            const o2 = parseFloat(document.getElementById('calcOdds2').value) || 0;
+            const total = parseFloat(document.getElementById('calcTotalStake').value) || 0;
+            const arb = (1 / o1) + (1 / o2);
+            const s1 = (total * (1 / o1)) / arb;
+            const s2 = (total * (1 / o2)) / arb;
+
+            pendingBets.push({
+                title: `Surebet (${b1} & ${b2})`,
+                b1: b1, b2: b2, o1: o1, o2: o2,
+                s1: s1, s2: s2, stake: total,
+                note: 'Hesaplayıcıdan Eklendi'
+            });
+
+            state.risk += total;
+            updateUI();
+            switchTab('track');
+        }
+
+        function addManualBet() {
+            const match = document.getElementById('manualMatch').value || 'Özel Surebet';
+            const b1 = document.getElementById('manB1').value || '1. Büro';
+            const o1 = parseFloat(document.getElementById('manO1').value) || 0;
+            const s1 = parseFloat(document.getElementById('manS1').value) || 0;
+            const b2 = document.getElementById('manB2').value || '2. Büro';
+            const o2 = parseFloat(document.getElementById('manO2').value) || 0;
+            const s2 = parseFloat(document.getElementById('manS2').value) || 0;
+            const note = document.getElementById('manualNote').value || '';
+
+            const totalStake = s1 + s2;
+            if (totalStake <= 0) return;
+
+            pendingBets.push({
+                title: match, b1: b1, b2: b2, o1: o1, o2: o2,
+                s1: s1, s2: s2, stake: totalStake, note: note
+            });
+
+            state.risk += totalStake;
+            updateUI();
+            switchTab('track');
+        }
+
+        function renderPending() {
+            const container = document.getElementById('pendingList');
+            if (pendingBets.length === 0) {
+                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Bekleyen surebet bulunmuyor.</div>';
+                return;
+            }
+            container.innerHTML = pendingBets.map((bet, idx) => `
+                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-bold text-xs text-white">${bet.title}</div>
+                            <div class="text-[10px] text-slate-300">1) ${bet.b1}: ${fmt(bet.s1)} @ ${bet.o1}</div>
+                            <div class="text-[10px] text-slate-300">2) ${bet.b2}: ${fmt(bet.s2)} @ ${bet.o2}</div>
+                            <div class="text-[10px] text-slate-400 pt-1">Toplam Yatırım: ${fmt(bet.stake)} | Not: ${bet.note}</div>
+                        </div>
+                        <button onclick="openSettleModal(${idx})" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-[10px]">Sonuçlandır</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSettled() {
+            const container = document.getElementById('settledList');
+            if (settledBets.length === 0) {
+                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Sonuçlanan surebet bulunmuyor.</div>';
+                return;
+            }
+            container.innerHTML = settledBets.map((bet, idx) => `
+                <div onclick="openDetailModal(${idx})" class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center text-xs cursor-pointer hover:bg-slate-800/80 transition">
+                    <div>
+                        <div class="font-bold text-white">${bet.title}</div>
+                        <div class="text-[10px] text-slate-400">Sonuç: <span class="text-blue-400 font-bold">${bet.winner}</span></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="${bet.net >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-extrabold">${bet.net >= 0 ? '+' : ''}${fmt(bet.net)}</div>
+                        <div class="text-[9px] text-slate-500">Yönet / Geri Al ➔</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openSettleModal(idx) {
+            currentSettleIndex = idx;
+            const bet = pendingBets[idx];
+            const select = document.getElementById('settleResultType');
+            select.innerHTML = `
+                <option value="b1">${bet.b1} Kazandı (Alınacak: ${fmt(bet.s1 * bet.o1)})</option>
+                <option value="b2">${bet.b2} Kazandı (Alınacak: ${fmt(bet.s2 * bet.o2)})</option>
+                <option value="lost">Her İki Taraf Da Kaybetti (Lost)</option>
+            `;
+            document.getElementById('settleModal').classList.remove('hidden');
+        }
+
+        function closeSettleModal() { document.getElementById('settleModal').classList.add('hidden'); }
+        function toggleBonusInput() {
+            const val = document.getElementById('bonusTakenSelect').value;
+            document.getElementById('bonusAmountContainer').classList.toggle('hidden', val !== 'evet');
+        }
+
+        function confirmSettle() {
+            if (currentSettleIndex === null) return;
+            const bet = pendingBets[currentSettleIndex];
+            const res = document.getElementById('settleResultType').value;
+            const bonusTaken = document.getElementById('bonusTakenSelect').value;
+            const bonusVal = parseFloat(document.getElementById('inputBonusVal').value) || 0;
+
+            state.risk -= bet.stake;
+            let net = 0;
+            let winnerName = '';
+
+            if (res === 'b1') { 
+                net = (bet.s1 * bet.o1) - bet.stake; 
+                winnerName = `${bet.b1} Kazandı`; 
+            } else if (res === 'b2') { 
+                net = (bet.s2 * bet.o2) - bet.stake; 
+                winnerName = `${bet.b2} Kazandı`; 
+            } else { 
+                net = -bet.stake; 
+                winnerName = 'Komple Kayıp'; 
+            }
+
+            if (bonusTaken === 'evet' && bonusVal > 0) {
+                state.bonus += bonusVal;
+                net += bonusVal;
+            }
+
+            state.balance += net;
+            state.netProfit += net;
+            if (net > 0) {
+                state.dailyProfit += net;
+                state.weeklyProfit += net;
+                state.monthlyProfit += net;
+            }
+
+            settledBets.push({
+                title: bet.title, b1: bet.b1, b2: bet.b2,
+                o1: bet.o1, o2: bet.o2, s1: bet.s1, s2: bet.s2,
+                stake: bet.stake, winner: winnerName, net: net,
+                bonus: bonusVal, note: bet.note
+            });
+
+            pendingBets.splice(currentSettleIndex, 1);
+            updateUI();
+            closeSettleModal();
+        }
+
+        function openDetailModal(idx) {
+            currentDetailIndex = idx;
+            const b = settledBets[idx];
+            document.getElementById('detailContent').innerHTML = `
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>Maç:</span> <strong class="text-white">${b.title}</strong></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>1. Büro Stake:</span> <span>${b.b1} (${b.o1}) - ${fmt(b.s1)}</span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>2. Büro Stake:</span> <span>${b.b2} (${b.o2}) - ${fmt(b.s2)}</span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>Toplam Yatırım:</span> <span>${fmt(b.stake)}</span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>Kayıp Bonusu:</span> <span class="text-blue-400 font-bold">${fmt(b.bonus)}</span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>Sonuç / Kazanan:</span> <span class="text-amber-400 font-bold">${b.winner}</span></div>
+                <div class="flex justify-between font-bold pt-1"><span>Gerçekleşen Net Kâr:</span> <span class="${b.net >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${fmt(b.net)}</span></div>
+            `;
+            document.getElementById('detailNoteText').value = b.note || '';
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
+        
+        function revertSettledBet() {
+            if (currentDetailIndex !== null) {
+                const b = settledBets[currentDetailIndex];
+                state.balance -= b.net;
+                state.netProfit -= b.net;
+                state.bonus -= b.bonus;
+                if(b.net > 0) {
+                    state.dailyProfit -= b.net;
+                    state.weeklyProfit -= b.net;
+                    state.monthlyProfit -= b.net;
+                }
+                state.risk += b.stake;
+
+                pendingBets.push({
+                    title: b.title, b1: b.b1, b2: b.b2,
+                    o1: b.o1, o2: b.o2, s1: b.s1, s2: b.s2,
+                    stake: b.stake, note: b.note
+                });
+
+                settledBets.splice(currentDetailIndex, 1);
+                updateUI();
+                closeDetailModal();
+                switchTab('track');
+            }
+        }
+
+        function deleteSettledBet() {
+            if (currentDetailIndex !== null) {
+                const b = settledBets[currentDetailIndex];
+                state.balance -= b.net;
+                state.netProfit -= b.net;
+                state.bonus -= b.bonus;
+                if(b.net > 0) {
+                    state.dailyProfit -= b.net;
+                    state.weeklyProfit -= b.net;
+                    state.monthlyProfit -= b.net;
+                }
+                settledBets.splice(currentDetailIndex, 1);
+                updateUI();
+                closeDetailModal();
+            }
+        }
+
+        function saveDetailNote() {
+            if (currentDetailIndex !== null) {
+                settledBets[currentDetailIndex].note = document.getElementById('detailNoteText').value;
+                updateUI();
+            }
+            closeDetailModal();
+        }
+
+        function confirmResetAll() {
+            if (confirm("Tüm kasayı, bahisleri ve verileri sıfırlamak istediğinize emin misiniz?")) {
+                localStorage.clear();
+                state = { balance: 10000, startBalance: 10000, goal: 20000, risk: 0, netProfit: 0, bonus: 0, currency: 'TRY', dailyProfit: 0, weeklyProfit: 0, monthlyProfit: 0 };
+                bookies = [{ name: 'Bet365', balance: 5000 }, { name: '1xBet', balance: 5000 }];
+                pendingBets = []; settledBets = [];
+                updateUI();
+                alert("Tüm veriler sıfırlandı!");
+            }
+        }
+
+        function openBalanceModal() {
+            document.getElementById('inputBalance').value = state.balance;
+            document.getElementById('inputGoal').value = state.goal;
+            document.getElementById('balanceModal').classList.remove('hidden');
+        }
+        function closeBalanceModal() { document.getElementById('balanceModal').classList.add('hidden'); }
+        function saveBalanceModal() {
+            state.balance = parseFloat(document.getElementById('inputBalance').value) || 0;
+            state.goal = parseFloat(document.getElementById('inputGoal').value) || 0;
+            updateUI();
+            closeBalanceModal();
+        }
+
+        function changeCurrency() { state.currency = document.getElementById('currencySelect').value; updateUI(); }
+        function changeTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            document.getElementById('bodyRoot').className = `${theme} pb-36 p-3 max-w-lg mx-auto space-y-4`;
+        }
+
+        function exportData(type) { alert(`Veriler ${type.toUpperCase()} formatında indiriliyor...`); }
+
+        window.onload = function() { 
+            loadData(); // Sayfa açıldığında hafızadan verileri yükle
+            updateUI(); 
+            recalcArb(); 
+        };
+    </script>
+</body>
+</html>
+"""
+
+@flask_app.route("/")
+def index():
+    response = make_response(render_template_string(HTML_TEMPLATE))
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
+@flask_app.route(f"/{BOT_TOKEN}", methods=["POST"])
+def webhook():
+    json_update = request.get_json(force=True)
+    update = Update.de_json(json_update, telegram_app.bot)
+    
+    async def process():
+        await telegram_app.process_update(update)
+
+    asyncio.run(process())
+    return "OK", 200
+
+if __name__ == "__main__":
+    async def main_setup():
+        await telegram_app.initialize()
+        import urllib.request
+        ext_url = RENDER_EXTERNAL_URL if RENDER_EXTERNAL_URL else BASE_URL
+        webhook_url = f"{ext_url}/{BOT_TOKEN}"
+        set_webhook_url = f"https://api.telegram.org/bot{BOT_TOKEN}/setWebhook?url={webhook_url}"
+        try:
+            urllib.request.urlopen(set_webhook_url)
+            print("Webhook başarıyla tanımlandı!")
+        except Exception as e:
+            print(f"Webhook hatası: {e}")
+
+    asyncio.run(main_setup())
+
+    port = int(os.environ.get("PORT", 10000))
+    flask_app.run(host="0.0.0.0", port=port)
