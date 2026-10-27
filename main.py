@@ -29,7 +29,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 telegram_app.add_handler(CommandHandler("start", start))
 
-# Tam Kapsamlı PRO HTML & CSS & JS Arayüzü
+# Tam Donanımlı PRO HTML & CSS & JS Arayüzü
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="tr" class="dark">
@@ -47,42 +47,36 @@ HTML_TEMPLATE = """
                 extend: {
                     colors: {
                         brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
-                        darkbg: '#0b0f17',
-                        cardbg: '#151c28',
-                        cardborder: '#212d40'
                     }
                 }
             }
         }
     </script>
     <style>
-        body { background-color: #0b0f17; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-        .tab-btn.active { background-color: #2563eb; color: #ffffff; font-weight: 600; shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+        .tab-btn.active { background-color: #2563eb; color: #ffffff; font-weight: 600; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
     </style>
 </head>
-<body class="pb-28 p-3 max-w-lg mx-auto space-y-4">
+<body id="bodyRoot" class="pb-32 p-3 max-w-lg mx-auto space-y-4 bg-[#0b0f17] text-slate-100 transition-colors duration-200">
 
     <!-- Üst Header -->
-    <header class="p-3.5 flex items-center justify-between border border-slate-800 bg-[#151c28] rounded-2xl shadow-xl">
+    <header class="p-3.5 flex items-center justify-between border border-slate-800 bg-[#151c28] rounded-2xl shadow-xl" id="mainHeader">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-500 border border-blue-500/30 flex items-center justify-center font-bold text-sm">TMA</div>
+            <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-500 border border-blue-500/30 flex items-center justify-center font-bold text-sm">PRO</div>
             <div>
-                <h1 class="font-bold text-sm tracking-wide text-white">Kasa & Arbitraj PRO</h1>
+                <h1 class="font-bold text-sm tracking-wide text-white">Kasa & Arbitraj</h1>
                 <p class="text-[11px] text-slate-400">Telegram Mini App Engine</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button onclick="exportToExcel()" class="text-xs px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-semibold rounded-lg border border-emerald-500/30 flex items-center gap-1.5 transition">
-                <i class="fa-solid fa-file-excel"></i> Excel İndir
-            </button>
-            <span class="text-xs px-2 py-1 bg-slate-800 text-slate-300 font-semibold rounded-lg border border-slate-700">₺ TRY</span>
+            <span id="currencyBadge" class="text-xs px-2.5 py-1.5 bg-blue-500/10 text-blue-400 font-semibold rounded-lg border border-blue-500/20">₺ TRY</span>
         </div>
     </header>
 
-    <!-- Toplam Kasa Kartı (Bakiye Düzenleme Modallı) -->
-    <div class="bg-[#151c28] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4 relative overflow-hidden">
+    <!-- Toplam Kasa Kartı -->
+    <div class="bg-[#151c28] p-5 rounded-2xl border border-slate-800 shadow-xl space-y-4 relative overflow-hidden" id="balanceCard">
         <div class="flex justify-between items-start">
             <div class="space-y-1">
                 <div class="text-[11px] font-semibold text-slate-400 tracking-wider flex items-center gap-1.5">
@@ -110,36 +104,39 @@ HTML_TEMPLATE = """
 
         <div class="grid grid-cols-3 gap-2 pt-3 border-t border-slate-800/80 text-center">
             <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/50">
-                <div class="text-[10px] font-semibold text-slate-400 uppercase">NET KÂR/ZARAR</div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase">NET KÂR</div>
                 <div id="displayNetProfit" class="text-xs font-black text-emerald-400 mt-1">+₺0,00</div>
             </div>
             <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/50">
-                <div class="text-[10px] font-semibold text-slate-400 uppercase">KAYIP BONUSU</div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase">BONUS</div>
                 <div id="displayBonus" class="text-xs font-black text-blue-400 mt-1">₺75,00</div>
             </div>
             <div class="bg-slate-900/60 p-2.5 rounded-xl border border-slate-800/50">
-                <div class="text-[10px] font-semibold text-slate-400 uppercase">ROI DEĞERİ</div>
+                <div class="text-[10px] font-semibold text-slate-400 uppercase">ROI</div>
                 <div id="displayROI" class="text-xs font-black text-purple-400 mt-1">%0.00</div>
             </div>
         </div>
     </div>
 
-    <!-- Sekme Navigasyonu -->
-    <div class="grid grid-cols-2 gap-1.5 p-1 bg-slate-900/80 rounded-xl border border-slate-800">
-        <button id="tabBtn1" onclick="switchTab('arb')" class="tab-btn active py-2 text-xs font-semibold rounded-lg text-slate-400 transition">
-            Arbitraj (Surebet)
+    <!-- ALT 3'LÜ SEKME NAVİGASYONU -->
+    <div class="grid grid-cols-3 gap-1 p-1 bg-slate-900/90 rounded-xl border border-slate-800">
+        <button id="tabBtn1" onclick="switchTab('calc')" class="tab-btn active py-2.5 text-[11px] font-semibold rounded-lg text-slate-400 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-calculator"></i> Hesaplayıcı
         </button>
-        <button id="tabBtn2" onclick="switchTab('kelly')" class="tab-btn py-2 text-xs font-semibold rounded-lg text-slate-400 transition">
-            Kelly / Oran Stake
+        <button id="tabBtn2" onclick="switchTab('track')" class="tab-btn py-2.5 text-[11px] font-semibold rounded-lg text-slate-400 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-list-check"></i> Bahis Takip
+        </button>
+        <button id="tabBtn3" onclick="switchTab('settings')" class="tab-btn py-2.5 text-[11px] font-semibold rounded-lg text-slate-400 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-sliders"></i> Özelleştir
         </button>
     </div>
 
-    <!-- TAB 1: ARB / SUREBET HESAPLAYICI -->
-    <div id="tabArb" class="tab-content active space-y-3">
-        <div class="bg-[#151c28] p-4 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
+    <!-- TAB 1: HESAPLAYICI (SUREBET + BEKLEYENE EKLE) -->
+    <div id="tabCalc" class="tab-content active space-y-3">
+        <div class="bg-[#151c28] p-4 rounded-2xl border border-slate-800 space-y-3 shadow-lg card-theme">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                    <i class="fa-solid fa-bolt text-amber-400"></i> 2 Yönlü Surebet Matriksi
+                    <i class="fa-solid fa-bolt text-amber-400"></i> Surebet Hesaplayıcı
                 </h3>
                 <span id="arbStatus" class="text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Fırsat Var</span>
             </div>
@@ -147,61 +144,114 @@ HTML_TEMPLATE = """
             <div class="grid grid-cols-2 gap-2">
                 <div>
                     <label class="text-[10px] font-semibold text-slate-400 block mb-1">1. Büro Oranı</label>
-                    <input type="number" id="arbOdds1" step="0.01" value="2.10" oninput="recalcArb()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs font-bold text-white focus:border-blue-500 focus:outline-none">
+                    <input type="number" id="calcOdds1" step="0.01" value="2.10" oninput="recalcArb()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs font-bold text-white focus:border-blue-500 focus:outline-none">
                 </div>
                 <div>
                     <label class="text-[10px] font-semibold text-slate-400 block mb-1">2. Büro Oranı</label>
-                    <input type="number" id="arbOdds2" step="0.01" value="2.05" oninput="recalcArb()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs font-bold text-white focus:border-blue-500 focus:outline-none">
+                    <input type="number" id="calcOdds2" step="0.01" value="2.05" oninput="recalcArb()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs font-bold text-white focus:border-blue-500 focus:outline-none">
                 </div>
             </div>
 
             <div>
-                <label class="text-[10px] font-semibold text-slate-400 block mb-1">Toplam Yatırılacak Bütçe (TRY)</label>
-                <input type="number" id="arbTotalStake" value="1000" oninput="recalcArb()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs font-bold text-white focus:border-blue-500 focus:outline-none">
+                <label class="text-[10px] font-semibold text-slate-400 block mb-1">Toplam Yatırılacak Bütçe</label>
+                <input type="number" id="calcTotalStake" value="1000" oninput="recalcArb()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs font-bold text-white focus:border-blue-500 focus:outline-none">
             </div>
 
             <div class="p-3 bg-slate-900/80 rounded-xl text-xs space-y-2 border border-slate-800">
                 <div class="flex justify-between items-center text-slate-300">
                     <span>1. Büro Stake:</span>
-                    <span id="arbStake1" class="font-bold text-white">₺506,02</span>
+                    <span id="resStake1" class="font-bold text-white">₺506,02</span>
                 </div>
                 <div class="flex justify-between items-center text-slate-300">
                     <span>2. Büro Stake:</span>
-                    <span id="arbStake2" class="font-bold text-white">₺493,98</span>
+                    <span id="resStake2" class="font-bold text-white">₺493,98</span>
                 </div>
                 <div class="flex justify-between items-center pt-2 border-t border-slate-800 font-bold">
                     <span class="text-slate-300">Garanti Net Kâr:</span>
-                    <span id="arbProfit" class="text-emerald-400 font-extrabold">+₺62,65 (%6.27)</span>
+                    <span id="resNetProfit" class="text-emerald-400 font-extrabold">+₺62,65 (%6.27)</span>
                 </div>
+            </div>
+
+            <button onclick="addCurrentBetToPending()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-plus"></i> Bu Bahsi Bekleyenlere Ekle
+            </button>
+        </div>
+    </div>
+
+    <!-- TAB 2: BAHİS TAKİP (BEKLEYENLER, SONUÇLANANLAR, MANUEL EKLEME VE NOTLAR) -->
+    <div id="tabTrack" class="tab-content space-y-3">
+        <!-- Manuel Bahis Ekleme Paneli -->
+        <div class="bg-[#151c28] p-4 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
+            <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
+                <i class="fa-solid fa-plus-circle text-blue-400"></i> Manuel Bahis Ekle
+            </h3>
+            <div class="grid grid-cols-2 gap-2">
+                <input type="text" id="manualMatch" placeholder="Maç Adı (Örn: GS - FB)" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
+                <input type="number" id="manualStake" placeholder="Yatırım Miktarı" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <input type="number" id="manualOdds" step="0.01" placeholder="Oran" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
+                <input type="text" id="manualNote" placeholder="Not (Opsiyonel)" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
+            </div>
+            <button onclick="addManualBet()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition">
+                Listeye Kaydet
+            </button>
+        </div>
+
+        <!-- Bekleyen Bahisler -->
+        <div class="bg-[#151c28] p-4 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
+            <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-clock"></i> Bekleyen Bahisler
+            </h3>
+            <div id="pendingList" class="space-y-2">
+                <!-- Dinamik Bekleyenler -->
+            </div>
+        </div>
+
+        <!-- Sonuçlanan Bahisler -->
+        <div class="bg-[#151c28] p-4 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
+            <h3 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                <i class="fa-solid fa-check-circle"></i> Sonuçlanan Bahisler
+            </h3>
+            <div id="settledList" class="space-y-2">
+                <!-- Dinamik Sonuçlananlar -->
             </div>
         </div>
     </div>
 
-    <!-- TAB 2: KELLY / ORAN STAKE HESAPLAYICI -->
-    <div id="tabKelly" class="tab-content space-y-3">
-        <div class="bg-[#151c28] p-4 rounded-2xl border border-slate-800 space-y-3 shadow-lg">
+    <!-- TAB 3: ÖZELLEŞTİRME VE VERİ İNDİRME -->
+    <div id="tabSettings" class="tab-content space-y-3">
+        <div class="bg-[#151c28] p-4 rounded-2xl border border-slate-800 space-y-4 shadow-lg">
             <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                <i class="fa-solid fa-calculator text-blue-400"></i> Kelly Kriteri & Risk Yönetimi
+                <i class="fa-solid fa-gear text-blue-400"></i> Uygulama Tercihleri
             </h3>
 
-            <div>
-                <label class="text-[10px] font-semibold text-slate-400 block mb-1">Bahis Oranı (Odds)</label>
-                <input type="number" id="kellyOdds" step="0.01" value="2.20" oninput="recalcKelly()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs font-bold text-white focus:border-blue-500 focus:outline-none">
+            <div class="space-y-2 text-xs">
+                <label class="text-slate-400 font-semibold block">Para Birimi Seçimi</label>
+                <select id="currencySelect" onchange="changeCurrency()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                    <option value="TRY">Türk Lirası (₺ TRY)</option>
+                    <option value="USDT">Tether ($ USDT)</option>
+                </select>
             </div>
 
-            <div>
-                <label class="text-[10px] font-semibold text-slate-400 block mb-1">Tahmini Kazanma İhtimali (%)</label>
-                <input type="number" id="kellyWinProb" value="55" oninput="recalcKelly()" class="w-full bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 text-xs font-bold text-white focus:border-blue-500 focus:outline-none">
+            <div class="space-y-2 text-xs">
+                <label class="text-slate-400 font-semibold block">Tema Seçimi</label>
+                <select id="themeSelect" onchange="changeTheme()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                    <option value="dark">Modern Koyu (Dark)</option>
+                    <option value="midnight">Gece Mavisi (Midnight)</option>
+                    <option value="light">Aydınlık (Light)</option>
+                </select>
             </div>
 
-            <div class="p-3 bg-slate-900/80 rounded-xl text-xs space-y-2 border border-slate-800">
-                <div class="flex justify-between items-center text-slate-300">
-                    <span>Önerilen Kelly Kasa Oranı:</span>
-                    <span id="kellyFraction" class="font-bold text-blue-400">%17.50</span>
-                </div>
-                <div class="flex justify-between items-center pt-2 border-t border-slate-800 font-bold">
-                    <span class="text-slate-300">Önerilen Stake (TRY):</span>
-                    <span id="kellyStake" class="text-emerald-400 font-extrabold">₺1.750,00</span>
+            <div class="pt-2 border-t border-slate-800 space-y-2">
+                <label class="text-slate-400 font-semibold block text-xs">Veri Dışa Aktarımı</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="exportData('excel')" class="py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 font-bold rounded-xl text-xs border border-emerald-500/30 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-file-excel"></i> Excel İndir
+                    </button>
+                    <button onclick="exportData('csv')" class="py-2.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 font-bold rounded-xl text-xs border border-blue-500/30 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-file-csv"></i> CSV İndir
+                    </button>
                 </div>
             </div>
         </div>
@@ -219,19 +269,19 @@ HTML_TEMPLATE = """
 
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="text-slate-400 block mb-1 font-semibold">Mevcut Toplam Kasa (TRY)</label>
+                    <label class="text-slate-400 block mb-1 font-semibold">Mevcut Toplam Kasa</label>
                     <input type="number" id="inputBalance" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
                 </div>
                 <div>
-                    <label class="text-slate-400 block mb-1 font-semibold">Hedef Kasa (TRY)</label>
+                    <label class="text-slate-400 block mb-1 font-semibold">Hedef Kasa</label>
                     <input type="number" id="inputGoal" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
                 </div>
                 <div>
-                    <label class="text-slate-400 block mb-1 font-semibold">Bekleyen Risk (TRY)</label>
+                    <label class="text-slate-400 block mb-1 font-semibold">Bekleyen Risk</label>
                     <input type="number" id="inputRisk" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
                 </div>
                 <div>
-                    <label class="text-slate-400 block mb-1 font-semibold">Kayıp Bonusu (TRY)</label>
+                    <label class="text-slate-400 block mb-1 font-semibold">Kayıp Bonusu</label>
                     <input type="number" id="inputBonus" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
                 </div>
             </div>
@@ -240,6 +290,61 @@ HTML_TEMPLATE = """
                 <button onclick="closeBalanceModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">İptal</button>
                 <button onclick="saveBalanceModal()" class="w-1/2 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition shadow-lg shadow-blue-600/30">Kaydet</button>
             </div>
+        </div>
+    </div>
+
+    <!-- SONUÇLANDIRMA VE BONUS MODALI -->
+    <div id="settleModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#151c28] w-full max-w-sm rounded-2xl border border-slate-800 p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-trophy text-amber-400"></i> Bahis Sonuçlandır
+                </h3>
+                <button onclick="closeSettleModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="text-slate-400 block mb-1 font-semibold">Hangi Büro Kazandı / Sonuç?</label>
+                    <select id="settleResultType" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                        <option value="büro1">1. Büro Kazandı</option>
+                        <option value="büro2">2. Büro Kazandı</option>
+                        <option value="kayıp">Komple Kayıp (Lost)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-slate-400 block mb-1 font-semibold">Kayıp Bonusu Alındı mı?</label>
+                    <select id="bonusTakenSelect" onchange="toggleBonusInput()" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                        <option value="hayir">Hayır</option>
+                        <option value="evet">Evet, Alındı</option>
+                    </select>
+                </div>
+                <div id="bonusAmountContainer" class="hidden">
+                    <label class="text-slate-400 block mb-1 font-semibold">Alınan Kayıp Bonusu Miktarı</label>
+                    <input type="number" id="inputBonusVal" value="0" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-white font-bold">
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2 border-t border-slate-800">
+                <button onclick="closeSettleModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs transition">İptal</button>
+                <button onclick="confirmSettle()" class="w-1/2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs transition shadow-lg shadow-emerald-600/30">Sonuçlandır</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOT BIRAKMA MODALI -->
+    <div id="noteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-[#151c28] w-full max-w-sm rounded-2xl border border-slate-800 p-5 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-note-sticky text-blue-400"></i> Bahis Notu Düzenle
+                </h3>
+                <button onclick="closeNoteModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div>
+                <textarea id="inputNoteText" rows="3" placeholder="Notunuzu buraya yazın..." class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-xs text-white"></textarea>
+            </div>
+            <button onclick="saveNote()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-lg">Notu Kaydet</button>
         </div>
     </div>
 
@@ -253,11 +358,22 @@ HTML_TEMPLATE = """
             risk: 300,
             netProfit: 0,
             bonus: 75,
-            roi: 0
+            roi: 0,
+            currency: 'TRY',
+            theme: 'dark'
         };
 
+        let pendingBets = [];
+        let settledBets = [];
+        let currentSettleIndex = null;
+        let currentNoteIndex = null;
+
+        function getSymbol() {
+            return state.currency === 'TRY' ? '₺' : '$';
+        }
+
         function fmt(num) {
-            return '₺' + num.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return getSymbol() + num.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
         function updateUI() {
@@ -267,21 +383,231 @@ HTML_TEMPLATE = """
             document.getElementById('displayNetProfit').innerText = (state.netProfit >= 0 ? '+' : '') + fmt(state.netProfit);
             document.getElementById('displayBonus').innerText = fmt(state.bonus);
             document.getElementById('displayROI').innerText = '%' + state.roi.toFixed(2);
+            document.getElementById('currencyBadge').innerText = state.currency === 'TRY' ? '₺ TRY' : '$ USDT';
+            renderPending();
+            renderSettled();
         }
 
         function switchTab(tab) {
-            document.getElementById('tabArb').classList.remove('active');
-            document.getElementById('tabKelly').classList.remove('active');
+            document.getElementById('tabCalc').classList.remove('active');
+            document.getElementById('tabTrack').classList.remove('active');
+            document.getElementById('tabSettings').classList.remove('active');
             document.getElementById('tabBtn1').classList.remove('active');
             document.getElementById('tabBtn2').classList.remove('active');
+            document.getElementById('tabBtn3').classList.remove('active');
 
-            if (tab === 'arb') {
-                document.getElementById('tabArb').classList.add('active');
+            if (tab === 'calc') {
+                document.getElementById('tabCalc').classList.add('active');
                 document.getElementById('tabBtn1').classList.add('active');
-            } else {
-                document.getElementById('tabKelly').classList.add('active');
+            } else if (tab === 'track') {
+                document.getElementById('tabTrack').classList.add('active');
                 document.getElementById('tabBtn2').classList.add('active');
+            } else {
+                document.getElementById('tabSettings').classList.add('active');
+                document.getElementById('tabBtn3').classList.add('active');
             }
+        }
+
+        function recalcArb() {
+            const o1 = parseFloat(document.getElementById('calcOdds1').value) || 0;
+            const o2 = parseFloat(document.getElementById('calcOdds2').value) || 0;
+            const total = parseFloat(document.getElementById('calcTotalStake').value) || 0;
+
+            if (o1 <= 1 || o2 <= 1 || total <= 0) return;
+
+            const arb = (1 / o1) + (1 / o2);
+            const s1 = (total * (1 / o1)) / arb;
+            const s2 = (total * (1 / o2)) / arb;
+            const profit = (s1 * o1) - total;
+            const profitPct = (profit / total) * 100;
+
+            document.getElementById('resStake1').innerText = fmt(s1);
+            document.getElementById('resStake2').innerText = fmt(s2);
+
+            const profitEl = document.getElementById('resNetProfit');
+            const statusEl = document.getElementById('arbStatus');
+
+            if (arb < 1) {
+                profitEl.className = "text-emerald-400 font-extrabold";
+                profitEl.innerText = '+' + fmt(profit) + ' (%' + profitPct.toFixed(2) + ')';
+                statusEl.className = "text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+                statusEl.innerText = "Fırsat Var";
+            } else {
+                profitEl.className = "text-rose-400 font-extrabold";
+                profitEl.innerText = fmt(profit) + ' (%' + profitPct.toFixed(2) + ')';
+                statusEl.className = "text-[10px] px-2 py-0.5 rounded font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
+                statusEl.innerText = "Arbitraj Yok";
+            }
+        }
+
+        function addCurrentBetToPending() {
+            const o1 = parseFloat(document.getElementById('calcOdds1').value) || 0;
+            const o2 = parseFloat(document.getElementById('calcOdds2').value) || 0;
+            const total = parseFloat(document.getElementById('calcTotalStake').value) || 0;
+            const arb = (1 / o1) + (1 / o2);
+            const s1 = (total * (1 / o1)) / arb;
+            const s2 = (total * (1 / o2)) / arb;
+            const profit = (s1 * o1) - total;
+
+            pendingBets.push({
+                title: `Surebet (Oranlar: ${o1} & ${o2})`,
+                stake: total,
+                profit: profit,
+                s1: s1,
+                s2: s2,
+                o1: o1,
+                o2: o2,
+                note: 'Surebet Hesaplayıcıdan eklendi'
+            });
+
+            state.risk += total;
+            updateUI();
+            switchTab('track');
+        }
+
+        function addManualBet() {
+            const match = document.getElementById('manualMatch').value || 'Özel Bahis';
+            const stake = parseFloat(document.getElementById('manualStake').value) || 0;
+            const odds = parseFloat(document.getElementById('manualOdds').value) || 0;
+            const note = document.getElementById('manualNote').value || '';
+
+            if (stake <= 0) return;
+
+            pendingBets.push({
+                title: match,
+                stake: stake,
+                profit: (stake * odds) - stake,
+                s1: stake,
+                s2: 0,
+                o1: odds,
+                o2: 0,
+                note: note
+            });
+
+            state.risk += stake;
+            document.getElementById('manualMatch').value = '';
+            document.getElementById('manualStake').value = '';
+            document.getElementById('manualOdds').value = '';
+            document.getElementById('manualNote').value = '';
+            updateUI();
+        }
+
+        function renderPending() {
+            const container = document.getElementById('pendingList');
+            if (pendingBets.length === 0) {
+                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Bekleyen bahis bulunmuyor.</div>';
+                return;
+            }
+            container.innerHTML = pendingBets.map((bet, idx) => `
+                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="font-bold text-xs text-white">${bet.title}</div>
+                            <div class="text-[10px] text-slate-400">Yatırım: ${getSymbol()}${bet.stake.toFixed(2)} | Not: ${bet.note}</div>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="openNoteModal(${idx})" class="px-2 py-1 bg-slate-800 text-blue-400 rounded text-[10px]"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="openSettleModal(${idx})" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded text-[10px]">Sonuçlandır</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderSettled() {
+            const container = document.getElementById('settledList');
+            if (settledBets.length === 0) {
+                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Sonuçlanan bahis bulunmuyor.</div>';
+                return;
+            }
+            container.innerHTML = settledBets.map(bet => `
+                <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                    <div>
+                        <div class="font-bold text-white">${bet.title}</div>
+                        <div class="text-[10px] text-slate-400">Durum: <span class="${bet.net >= 0 ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}">${bet.status}</span></div>
+                    </div>
+                    <div class="text-right">
+                        <div class="${bet.net >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-extrabold">${bet.net >= 0 ? '+' : ''}${fmt(bet.net)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openSettleModal(idx) {
+            currentSettleIndex = idx;
+            document.getElementById('settleModal').classList.remove('hidden');
+        }
+
+        function closeSettleModal() {
+            document.getElementById('settleModal').classList.add('hidden');
+            currentSettleIndex = null;
+        }
+
+        function toggleBonusInput() {
+            const val = document.getElementById('bonusTakenSelect').value;
+            const container = document.getElementById('bonusAmountContainer');
+            if (val === 'evet') container.classList.remove('hidden');
+            else container.classList.add('hidden');
+        }
+
+        function confirmSettle() {
+            if (currentSettleIndex === null) return;
+            const bet = pendingBets[currentSettleIndex];
+            const resultType = document.getElementById('settleResultType').value;
+            const bonusTaken = document.getElementById('bonusTakenSelect').value;
+            const bonusVal = parseFloat(document.getElementById('inputBonusVal').value) || 0;
+
+            state.risk -= bet.stake;
+            let netResult = 0;
+            let statusText = '';
+
+            if (resultType === 'büro1') {
+                netResult = (bet.s1 * bet.o1) - bet.stake;
+                statusText = '1. Büro Kazandı';
+            } else if (resultType === 'büro2') {
+                netResult = (bet.s2 * bet.o2) - bet.stake;
+                statusText = '2. Büro Kazandı';
+            } else {
+                netResult = -bet.stake;
+                statusText = 'Kayıp';
+            }
+
+            if (bonusTaken === 'evet' && bonusVal > 0) {
+                state.bonus += bonusVal;
+                netResult += bonusVal;
+            }
+
+            state.balance += netResult;
+            state.netProfit += netResult;
+
+            settledBets.push({
+                title: bet.title,
+                net: netResult,
+                status: statusText
+            });
+
+            pendingBets.splice(currentSettleIndex, 1);
+            updateUI();
+            closeSettleModal();
+        }
+
+        function openNoteModal(idx) {
+            currentNoteIndex = idx;
+            document.getElementById('inputNoteText').value = pendingBets[idx].note;
+            document.getElementById('noteModal').classList.remove('hidden');
+        }
+
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.add('hidden');
+            currentNoteIndex = null;
+        }
+
+        function saveNote() {
+            if (currentNoteIndex !== null) {
+                pendingBets[currentNoteIndex].note = document.getElementById('inputNoteText').value;
+                renderPending();
+            }
+            closeNoteModal();
         }
 
         function openBalanceModal() {
@@ -302,68 +628,33 @@ HTML_TEMPLATE = """
             state.risk = parseFloat(document.getElementById('inputRisk').value) || 0;
             state.bonus = parseFloat(document.getElementById('inputBonus').value) || 0;
             updateUI();
-            recalcKelly();
             closeBalanceModal();
         }
 
-        function recalcArb() {
-            const o1 = parseFloat(document.getElementById('arbOdds1').value) || 0;
-            const o2 = parseFloat(document.getElementById('arbOdds2').value) || 0;
-            const total = parseFloat(document.getElementById('arbTotalStake').value) || 0;
+        function changeCurrency() {
+            state.currency = document.getElementById('currencySelect').value;
+            updateUI();
+        }
 
-            if (o1 <= 1 || o2 <= 1 || total <= 0) return;
-
-            const arb = (1 / o1) + (1 / o2);
-            const s1 = (total * (1 / o1)) / arb;
-            const s2 = (total * (1 / o2)) / arb;
-            const profit = (s1 * o1) - total;
-            const profitPct = (profit / total) * 100;
-
-            document.getElementById('arbStake1').innerText = fmt(s1);
-            document.getElementById('arbStake2').innerText = fmt(s2);
-
-            const profitEl = document.getElementById('arbProfit');
-            const statusEl = document.getElementById('arbStatus');
-
-            if (arb < 1) {
-                profitEl.className = "text-emerald-400 font-extrabold";
-                profitEl.innerText = '+' + fmt(profit) + ' (%' + profitPct.toFixed(2) + ')';
-                statusEl.className = "text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-                statusEl.innerText = "Fırsat Var";
+        function changeTheme() {
+            const theme = document.getElementById('themeSelect').value;
+            const root = document.getElementById('bodyRoot');
+            if (theme === 'light') {
+                root.className = "pb-32 p-3 max-w-lg mx-auto space-y-4 bg-slate-100 text-slate-900 transition-colors duration-200";
+            } else if (theme === 'midnight') {
+                root.className = "pb-32 p-3 max-w-lg mx-auto space-y-4 bg-slate-950 text-slate-100 transition-colors duration-200";
             } else {
-                profitEl.className = "text-rose-400 font-extrabold";
-                profitEl.innerText = fmt(profit) + ' (%' + profitPct.toFixed(2) + ')';
-                statusEl.className = "text-[10px] px-2 py-0.5 rounded font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20";
-                statusEl.innerText = "Arbitraj Yok";
+                root.className = "pb-32 p-3 max-w-lg mx-auto space-y-4 bg-[#0b0f17] text-slate-100 transition-colors duration-200";
             }
         }
 
-        function recalcKelly() {
-            const odds = parseFloat(document.getElementById('kellyOdds').value) || 0;
-            const prob = (parseFloat(document.getElementById('kellyWinProb').value) || 0) / 100;
-
-            if (odds <= 1 || prob <= 0) return;
-
-            const b = odds - 1;
-            const q = 1 - prob;
-            let f = (b * prob - q) / b;
-
-            if (f < 0) f = 0;
-
-            const stake = state.balance * f;
-
-            document.getElementById('kellyFraction').innerText = '%' + (f * 100).toFixed(2);
-            document.getElementById('kellyStake').innerText = fmt(stake);
-        }
-
-        function exportToExcel() {
-            alert('Kasa hareketleri Excel formatında aktarılıyor...');
+        function exportData(type) {
+            alert(`Veriler ${type.toUpperCase()} formatında indiriliyor...`);
         }
 
         window.onload = function() {
             updateUI();
             recalcArb();
-            recalcKelly();
         };
     </script>
 </body>
