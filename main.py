@@ -10,19 +10,19 @@ flask_app = Flask(__name__)
 
 BOT_TOKEN = os.getenv("BOT_TOKEN", "8886446926:AAFUBRKk6qDUvQi1dsneaFQXkUIKBz-sGgg")
 BASE_URL = "https://telegram-kasa-bot.onrender.com"
-WEB_APP_URL = f"{BASE_URL}?v=4"
+WEB_APP_URL = f"{BASE_URL}?v=5"
 RENDER_EXTERNAL_URL = os.getenv("RENDER_EXTERNAL_URL", "")
 
 telegram_app = Application.builder().token(BOT_TOKEN).build()
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = [
-        [InlineKeyboardButton("🚀 Kasa & Arbitraj PRO v4", web_app=WebAppInfo(url=WEB_APP_URL))]
+        [InlineKeyboardButton("🚀 Surebet PRO v5", web_app=WebAppInfo(url=WEB_APP_URL))]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await update.message.reply_text(
-        "📊 *Kasa & Arbitraj PRO Yönetim Sistemi v4*\n\n"
+        "📊 *Surebet Kasa & Arbitraj PRO v5*\n\n"
         "Gelişmiş arayüze erişmek için aşağıdaki butona tıklayabilirsin:",
         reply_markup=reply_markup,
         parse_mode="Markdown"
@@ -30,7 +30,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 telegram_app.add_handler(CommandHandler("start", start))
 
-# PRO HTML & CSS & JS Arayüzü v4
+# PRO HTML & CSS & JS Arayüzü v5 (Surebet Odaklı)
 HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html lang="tr" class="dark">
@@ -40,7 +40,7 @@ HTML_TEMPLATE = """
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <title>Kasa & Arbitraj PRO v4</title>
+    <title>Surebet Kasa & Arbitraj PRO v5</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -64,10 +64,10 @@ HTML_TEMPLATE = """
     <!-- Header -->
     <header class="p-3.5 flex items-center justify-between border theme-card rounded-2xl shadow-xl">
         <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-sm">v4</div>
+            <div class="w-9 h-9 rounded-xl bg-blue-600/20 text-blue-400 border border-blue-500/30 flex items-center justify-center font-bold text-sm">v5</div>
             <div>
-                <h1 class="font-bold text-sm tracking-wide text-white">Kasa & Arbitraj PRO</h1>
-                <p class="text-[11px] text-slate-400">Telegram Mini App Engine</p>
+                <h1 class="font-bold text-sm tracking-wide text-white">Surebet & Arbitraj PRO</h1>
+                <p class="text-[11px] text-slate-400">Çift Büro Stake Motoru</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -87,6 +87,22 @@ HTML_TEMPLATE = """
         <div id="bankWithdrawAmount" class="text-sm font-black text-amber-400">₺0,00</div>
     </div>
 
+    <!-- Zaman Bazlı İstatistik Kartları (Günlük, Haftalık, Aylık) -->
+    <div class="grid grid-cols-3 gap-2">
+        <div class="theme-card p-2.5 rounded-xl border text-center space-y-1 shadow">
+            <span class="text-[10px] text-slate-400 font-bold block">GÜNLÜK KÂR</span>
+            <div id="statDaily" class="text-xs font-black text-emerald-400">+₺0,00</div>
+        </div>
+        <div class="theme-card p-2.5 rounded-xl border text-center space-y-1 shadow">
+            <span class="text-[10px] text-slate-400 font-bold block">HAFTALIK KÂR</span>
+            <div id="statWeekly" class="text-xs font-black text-emerald-400">+₺0,00</div>
+        </div>
+        <div class="theme-card p-2.5 rounded-xl border text-center space-y-1 shadow">
+            <span class="text-[10px] text-slate-400 font-bold block">AYLIK KÂR</span>
+            <div id="statMonthly" class="text-xs font-black text-emerald-400">+₺0,00</div>
+        </div>
+    </div>
+
     <!-- Toplam Kasa Kartı ve Hedef İlerleme Çubuğu -->
     <div class="theme-card p-5 rounded-2xl border shadow-xl space-y-4 relative overflow-hidden">
         <div class="flex justify-between items-start">
@@ -103,7 +119,7 @@ HTML_TEMPLATE = """
             </button>
         </div>
 
-        <!-- Hedef İlerleme Çubuğu (Progress Bar) -->
+        <!-- Hedef İlerleme Çubuğu -->
         <div class="space-y-1.5">
             <div class="flex justify-between text-[11px] font-semibold">
                 <span class="text-slate-400">Kasa Hedefi İlerlemesi</span>
@@ -138,28 +154,23 @@ HTML_TEMPLATE = """
     <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
         <div class="flex justify-between items-center">
             <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                <i class="fa-solid fa-building-columns text-blue-400"></i> Büro Bakiyeleri & Cüzdanlar
+                <i class="fa-solid fa-building-columns text-blue-400"></i> Büro Bakiyeleri (Cüzdanlar)
             </h3>
             <button onclick="addNewBookie()" class="text-[10px] px-2 py-1 bg-blue-600/20 text-blue-400 font-bold rounded-lg border border-blue-500/30">+ Büro Ekle</button>
         </div>
-        <div id="bookiesContainer" class="grid grid-cols-2 gap-2">
-            <!-- JS Dinamik Dolduracak -->
-        </div>
+        <div id="bookiesContainer" class="grid grid-cols-2 gap-2"></div>
     </div>
 
-    <!-- ALT 4'LÜ SEKME NAVİGASYONU -->
-    <div class="grid grid-cols-4 gap-1 p-1 bg-slate-900/90 rounded-xl border border-slate-800">
-        <button id="tabBtn1" onclick="switchTab('calc')" class="tab-btn active py-2.5 text-[10px] font-semibold rounded-lg text-slate-400 transition flex flex-col items-center gap-0.5">
-            <i class="fa-solid fa-calculator text-xs"></i> Hesaplayıcı
+    <!-- ALT 3'LÜ SEKME NAVİGASYONU -->
+    <div class="grid grid-cols-3 gap-1 p-1 bg-slate-900/90 rounded-xl border border-slate-800">
+        <button id="tabBtn1" onclick="switchTab('calc')" class="tab-btn active py-2.5 text-[11px] font-semibold rounded-lg text-slate-400 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-calculator"></i> Hesaplayıcı
         </button>
-        <button id="tabBtn2" onclick="switchTab('track')" class="tab-btn py-2.5 text-[10px] font-semibold rounded-lg text-slate-400 transition flex flex-col items-center gap-0.5">
-            <i class="fa-solid fa-list-check text-xs"></i> Bahis Takip
+        <button id="tabBtn2" onclick="switchTab('track')" class="tab-btn py-2.5 text-[11px] font-semibold rounded-lg text-slate-400 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-list-check"></i> Bahis Takip
         </button>
-        <button id="tabBtn3" onclick="switchTab('rollover')" class="tab-btn py-2.5 text-[10px] font-semibold rounded-lg text-slate-400 transition flex flex-col items-center gap-0.5">
-            <i class="fa-solid fa-sync text-xs"></i> Çevrim Takip
-        </button>
-        <button id="tabBtn4" onclick="switchTab('settings')" class="tab-btn py-2.5 text-[10px] font-semibold rounded-lg text-slate-400 transition flex flex-col items-center gap-0.5">
-            <i class="fa-solid fa-sliders text-xs"></i> Özelleştir
+        <button id="tabBtn3" onclick="switchTab('settings')" class="tab-btn py-2.5 text-[11px] font-semibold rounded-lg text-slate-400 transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-sliders"></i> Özelleştir
         </button>
     </div>
 
@@ -168,7 +179,7 @@ HTML_TEMPLATE = """
         <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                    <i class="fa-solid fa-bolt text-amber-400"></i> Surebet Hesaplayıcı
+                    <i class="fa-solid fa-bolt text-amber-400"></i> Surebet Çapraz Hesaplayıcı
                 </h3>
                 <span id="arbStatus" class="text-[10px] px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Fırsat Var</span>
             </div>
@@ -197,11 +208,11 @@ HTML_TEMPLATE = """
 
             <div class="p-3 bg-slate-900/80 rounded-xl text-xs space-y-2 border border-slate-800">
                 <div class="flex justify-between items-center text-slate-300">
-                    <span id="labelB1Stake">1. Büro Stake:</span>
+                    <span id="labelB1Stake">1. Büro Stake (Miktar):</span>
                     <span id="resStake1" class="font-bold text-white">₺506,02</span>
                 </div>
                 <div class="flex justify-between items-center text-slate-300">
-                    <span id="labelB2Stake">2. Büro Stake:</span>
+                    <span id="labelB2Stake">2. Büro Stake (Miktar):</span>
                     <span id="resStake2" class="font-bold text-white">₺493,98</span>
                 </div>
                 <div class="flex justify-between items-center pt-2 border-t border-slate-800 font-bold">
@@ -211,51 +222,50 @@ HTML_TEMPLATE = """
             </div>
 
             <button onclick="addCurrentBetToPending()" class="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-blue-600/30 transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-circle-plus"></i> Bu Bahsi Bekleyenlere Ekle
+                <i class="fa-solid fa-circle-plus"></i> Bu Surebet Bahsini Bekleyenlere Ekle
             </button>
         </div>
     </div>
 
-    <!-- TAB 2: BAHİS TAKİP -->
+    <!-- TAB 2: BAHİS TAKİP (ÇİFT BÜRO AYRI STAKE GİRİŞİ) -->
     <div id="tabTrack" class="tab-content space-y-3">
-        <!-- Çift Büro Destekli Manuel Bahis Ekleme Paneli -->
+        <!-- Manuel Çapraz Bahis Ekleme Paneli -->
         <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
             <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                <i class="fa-solid fa-plus-circle text-blue-400"></i> Manuel Bahis Ekle
+                <i class="fa-solid fa-plus-circle text-blue-400"></i> Manuel Surebet Ekle (Ayrı Oran & Miktarlar)
             </h3>
             <input type="text" id="manualMatch" placeholder="Maç Adı (Örn: Galatasaray - Fenerbahçe)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
             
             <div class="grid grid-cols-2 gap-2">
                 <div>
-                    <label class="text-[9px] text-slate-400 block mb-0.5">1. Büro / Oran</label>
+                    <label class="text-[9px] text-slate-400 block mb-0.5">1. Büro / Oran / Miktar</label>
+                    <input type="text" id="manB1" placeholder="Büro Adı" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-white mb-1">
                     <div class="flex gap-1">
-                        <input type="text" id="manB1" placeholder="Bet365" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                        <input type="number" id="manO1" step="0.01" placeholder="2.10" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
+                        <input type="number" id="manO1" step="0.01" placeholder="Oran" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-white">
+                        <input type="number" id="manS1" placeholder="Miktar" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-white">
                     </div>
                 </div>
                 <div>
-                    <label class="text-[9px] text-slate-400 block mb-0.5">2. Büro / Oran</label>
+                    <label class="text-[9px] text-slate-400 block mb-0.5">2. Büro / Oran / Miktar</label>
+                    <input type="text" id="manB2" placeholder="Büro Adı" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-white mb-1">
                     <div class="flex gap-1">
-                        <input type="text" id="manB2" placeholder="1xBet" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                        <input type="number" id="manO2" step="0.01" placeholder="2.05" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
+                        <input type="number" id="manO2" step="0.01" placeholder="Oran" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-white">
+                        <input type="number" id="manS2" placeholder="Miktar" class="w-1/2 bg-slate-900 border border-slate-700 rounded-xl p-1.5 text-xs text-white">
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-2">
-                <input type="number" id="manualStake" placeholder="Toplam Bütçe (TRY)" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                <input type="text" id="manualNote" placeholder="Not (Opsiyonel)" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-            </div>
+            <input type="text" id="manualNote" placeholder="Not (Opsiyonel)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
 
             <button onclick="addManualBet()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs border border-slate-700 transition">
-                Listeye Kaydet
+                Çapraz Bahsi Listeye Kaydet
             </button>
         </div>
 
         <!-- Bekleyen Bahisler -->
         <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
             <h3 class="text-xs font-bold text-amber-400 flex items-center gap-1.5">
-                <i class="fa-solid fa-clock"></i> Bekleyen Bahisler
+                <i class="fa-solid fa-clock"></i> Bekleyen Surebetler
             </h3>
             <div id="pendingList" class="space-y-2"></div>
         </div>
@@ -263,62 +273,18 @@ HTML_TEMPLATE = """
         <!-- Sonuçlanan Bahisler -->
         <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
             <h3 class="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                <i class="fa-solid fa-check-circle"></i> Sonuçlanan Bahisler (Düzenle & Geri Al)
+                <i class="fa-solid fa-check-circle"></i> Sonuçlanan Surebetler (Detay, Geri Al & Sil)
             </h3>
             <div id="settledList" class="space-y-2"></div>
         </div>
     </div>
 
-    <!-- TAB 3: ÇEVRİM (ROLLOVER) TAKİP MODÜLÜ -->
-    <div id="tabRollover" class="tab-content space-y-3">
-        <div class="theme-card p-4 rounded-2xl border space-y-3 shadow-lg">
-            <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
-                <i class="fa-solid fa-sync text-indigo-400"></i> Bonus Çevrim (Rollover) Takibi
-            </h3>
-            
-            <div class="space-y-2">
-                <input type="text" id="rollName" placeholder="Bonus Adı (Örn: Bet365 Hoşgeldin)" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                <div class="grid grid-cols-3 gap-2">
-                    <input type="number" id="rollBonus" placeholder="Bonus (TRY)" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                    <input type="number" id="rollMultiplier" placeholder="Çevrim (Örn: 5x)" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                    <input type="number" id="rollDone" placeholder="Yapılan (TRY)" class="bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white">
-                </div>
-                <button onclick="addRolloverTracker()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl text-xs transition">
-                    Çevrim Takibi Ekle
-                </button>
-            </div>
-
-            <div id="rolloverList" class="space-y-3 pt-2">
-                <!-- JS Dinamik Dolduracak -->
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB 4: ÖZELLEŞTİRME & KUR & VERİ SIFIRLAMA -->
+    <!-- TAB 3: ÖZELLEŞTİRME & VERİ SIFIRLAMA -->
     <div id="tabSettings" class="tab-content space-y-3">
         <div class="theme-card p-4 rounded-2xl border space-y-4 shadow-lg">
             <h3 class="text-xs font-bold text-white flex items-center gap-1.5">
                 <i class="fa-solid fa-gear text-blue-400"></i> Uygulama Tercihleri
             </h3>
-
-            <!-- Hızlı Döviz / Kripto Dönüştürücü -->
-            <div class="p-3 bg-slate-900/80 rounded-xl border border-slate-800 space-y-2 text-xs">
-                <span class="font-bold text-slate-300 block"><i class="fa-solid fa-coins text-amber-400"></i> Hızlı Kur Dönüştürücü</span>
-                <div class="grid grid-cols-3 gap-2">
-                    <input type="number" id="convAmount" value="100" oninput="recalcConverter()" placeholder="Miktar" class="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white">
-                    <select id="convFrom" onchange="recalcConverter()" class="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white">
-                        <option value="TRY">TRY (₺)</option>
-                        <option value="USD">USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
-                    </select>
-                    <select id="convTo" onchange="recalcConverter()" class="bg-slate-900 border border-slate-700 rounded-lg p-1.5 text-xs text-white">
-                        <option value="USD">USD ($)</option>
-                        <option value="TRY">TRY (₺)</option>
-                        <option value="EUR">EUR (€)</option>
-                    </select>
-                </div>
-                <div id="convResult" class="text-right font-black text-emerald-400 text-xs pt-1">100 TRY = 2.94 USD</div>
-            </div>
 
             <div class="space-y-2 text-xs">
                 <label class="text-slate-400 font-semibold block">Tema Seçimi</label>
@@ -414,7 +380,7 @@ HTML_TEMPLATE = """
         <div class="theme-card w-full max-w-sm rounded-2xl border p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-trophy text-amber-400"></i> Bahis Sonuçlandır
+                    <i class="fa-solid fa-trophy text-amber-400"></i> Surebet Sonuçlandır
                 </h3>
                 <button onclick="closeSettleModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -439,17 +405,17 @@ HTML_TEMPLATE = """
 
             <div class="flex gap-2 pt-2 border-t border-slate-800">
                 <button onclick="closeSettleModal()" class="w-1/2 py-2.5 rounded-xl bg-slate-800 text-slate-300 font-semibold text-xs">İptal</button>
-                <button onclick="confirmSettle()" class="w-1/2 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-xs shadow-lg">Sonuçlandır</button>
+                <button onclick="confirmSettle()" class="w-1/2 py-2.5 rounded-xl bg-emerald-600 text-white font-semibold text-xs shadow-lg">Surebet Sonuçlandır</button>
             </div>
         </div>
     </div>
 
-    <!-- SONUÇLANAN BAHİS DETAY, DÜZENLE & GERİ AL MODALI -->
+    <!-- SONUÇLANAN BAHİS DETAY, GERİ AL, SİL & NOT MODALI -->
     <div id="detailModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="theme-card w-full max-w-sm rounded-2xl border p-5 space-y-4 shadow-2xl">
             <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-circle-info text-blue-400"></i> Bahis Detayı & Geri Al
+                    <i class="fa-solid fa-circle-info text-blue-400"></i> Surebet Detayı & Yönetimi
                 </h3>
                 <button onclick="closeDetailModal()" class="text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
             </div>
@@ -461,11 +427,10 @@ HTML_TEMPLATE = """
                 <textarea id="detailNoteText" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-xs text-white"></textarea>
             </div>
 
-            <div class="flex gap-2 pt-2 border-t border-slate-800">
-                <button onclick="revertSettledBet()" class="w-1/2 py-2 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/30 text-xs font-bold">
-                    <i class="fa-solid fa-rotate-left"></i> Bekleyene Geri Al
-                </button>
-                <button onclick="saveDetailNote()" class="w-1/2 py-2 rounded-xl bg-blue-600 text-white text-xs font-bold">Notu Güncelle</button>
+            <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-800 text-xs">
+                <button onclick="revertSettledBet()" class="py-2 rounded-xl bg-amber-600/20 text-amber-400 border border-amber-500/30 font-bold">Geri Al</button>
+                <button onclick="saveDetailNote()" class="py-2 rounded-xl bg-blue-600 text-white font-bold">Not Kaydet</button>
+                <button onclick="deleteSettledBet()" class="py-2 rounded-xl bg-rose-600/20 text-rose-400 border border-rose-500/30 font-bold">Tamamen Sil</button>
             </div>
         </div>
     </div>
@@ -482,7 +447,9 @@ HTML_TEMPLATE = """
             netProfit: 0,
             bonus: 0,
             currency: 'TRY',
-            dailyProfit: 0
+            dailyProfit: 0,
+            weeklyProfit: 0,
+            monthlyProfit: 0
         };
 
         let bookies = [
@@ -492,7 +459,6 @@ HTML_TEMPLATE = """
 
         let pendingBets = [];
         let settledBets = [];
-        let rollovers = [];
 
         let currentSettleIndex = null;
         let currentDetailIndex = null;
@@ -514,7 +480,7 @@ HTML_TEMPLATE = """
             document.getElementById('displayBonus').innerText = fmt(state.bonus);
             document.getElementById('currencyBadge').innerText = `${getSymbol()} ${state.currency}`;
 
-            // Progress Bar Hesaplama
+            // İlerleme Çubuğu
             const progressPct = Math.min(100, Math.max(0, ((state.balance - state.startBalance) / (state.goal - state.startBalance)) * 100));
             document.getElementById('goalProgressPct').innerText = '%' + (isNaN(progressPct) ? 0 : progressPct.toFixed(1));
             document.getElementById('goalProgressBar').style.width = (isNaN(progressPct) ? 0 : progressPct) + '%';
@@ -523,11 +489,14 @@ HTML_TEMPLATE = """
             const bankCut = state.dailyProfit > 0 ? state.dailyProfit * 0.10 : 0;
             document.getElementById('bankWithdrawAmount').innerText = fmt(bankCut);
 
+            // Günlük, Haftalık, Aylık İstatistikler
+            document.getElementById('statDaily').innerText = (state.dailyProfit >= 0 ? '+' : '') + fmt(state.dailyProfit);
+            document.getElementById('statWeekly').innerText = (state.weeklyProfit >= 0 ? '+' : '') + fmt(state.weeklyProfit);
+            document.getElementById('statMonthly').innerText = (state.monthlyProfit >= 0 ? '+' : '') + fmt(state.monthlyProfit);
+
             renderBookies();
             renderPending();
             renderSettled();
-            renderRollovers();
-            recalcConverter();
         }
 
         function switchTab(tab) {
@@ -536,8 +505,7 @@ HTML_TEMPLATE = """
 
             if (tab === 'calc') { document.getElementById('tabCalc').classList.add('active'); document.getElementById('tabBtn1').classList.add('active'); }
             else if (tab === 'track') { document.getElementById('tabTrack').classList.add('active'); document.getElementById('tabBtn2').classList.add('active'); }
-            else if (tab === 'rollover') { document.getElementById('tabRollover').classList.add('active'); document.getElementById('tabBtn3').classList.add('active'); }
-            else { document.getElementById('tabSettings').classList.add('active'); document.getElementById('tabBtn4').classList.add('active'); }
+            else { document.getElementById('tabSettings').classList.add('active'); document.getElementById('tabBtn3').classList.add('active'); }
         }
 
         function renderBookies() {
@@ -579,8 +547,7 @@ HTML_TEMPLATE = """
             openBookieModal(bookies.length - 1);
         }
         function updateBookieTotal() {
-            const sum = bookies.reduce((acc, b) => acc + b.balance, 0);
-            state.balance = sum;
+            state.balance = bookies.reduce((acc, b) => acc + b.balance, 0);
         }
 
         function recalcArb() {
@@ -590,8 +557,8 @@ HTML_TEMPLATE = """
             const o2 = parseFloat(document.getElementById('calcOdds2').value) || 0;
             const total = parseFloat(document.getElementById('calcTotalStake').value) || 0;
 
-            document.getElementById('labelB1Stake').innerText = `${b1} Stake:`;
-            document.getElementById('labelB2Stake').innerText = `${b2} Stake:`;
+            document.getElementById('labelB1Stake').innerText = `${b1} Stake (Miktar):`;
+            document.getElementById('labelB2Stake').innerText = `${b2} Stake (Miktar):`;
 
             if (o1 <= 1 || o2 <= 1 || total <= 0) return;
 
@@ -643,29 +610,32 @@ HTML_TEMPLATE = """
         }
 
         function addManualBet() {
-            const match = document.getElementById('manualMatch').value || 'Özel Bahis';
+            const match = document.getElementById('manualMatch').value || 'Özel Surebet';
             const b1 = document.getElementById('manB1').value || '1. Büro';
             const o1 = parseFloat(document.getElementById('manO1').value) || 0;
+            const s1 = parseFloat(document.getElementById('manS1').value) || 0;
             const b2 = document.getElementById('manB2').value || '2. Büro';
             const o2 = parseFloat(document.getElementById('manO2').value) || 0;
-            const total = parseFloat(document.getElementById('manualStake').value) || 0;
+            const s2 = parseFloat(document.getElementById('manS2').value) || 0;
             const note = document.getElementById('manualNote').value || '';
 
-            if (total <= 0) return;
+            const totalStake = s1 + s2;
+            if (totalStake <= 0) return;
 
             pendingBets.push({
                 title: match, b1: b1, b2: b2, o1: o1, o2: o2,
-                s1: total / 2, s2: total / 2, stake: total, note: note
+                s1: s1, s2: s2, stake: totalStake, note: note
             });
 
-            state.risk += total;
+            state.risk += totalStake;
             updateUI();
+            switchTab('track');
         }
 
         function renderPending() {
             const container = document.getElementById('pendingList');
             if (pendingBets.length === 0) {
-                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Bekleyen bahis bulunmuyor.</div>';
+                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Bekleyen surebet bulunmuyor.</div>';
                 return;
             }
             container.innerHTML = pendingBets.map((bet, idx) => `
@@ -673,8 +643,9 @@ HTML_TEMPLATE = """
                     <div class="flex justify-between items-start">
                         <div>
                             <div class="font-bold text-xs text-white">${bet.title}</div>
-                            <div class="text-[10px] text-slate-400">${bet.b1} (${bet.o1}) vs ${bet.b2} (${bet.o2})</div>
-                            <div class="text-[10px] text-slate-400">Yatırım: ${fmt(bet.stake)} | Not: ${bet.note}</div>
+                            <div class="text-[10px] text-slate-300">1) ${bet.b1}: ${fmt(bet.s1)} @ ${bet.o1}</div>
+                            <div class="text-[10px] text-slate-300">2) ${bet.b2}: ${fmt(bet.s2)} @ ${bet.o2}</div>
+                            <div class="text-[10px] text-slate-400 pt-1">Toplam Yatırım: ${fmt(bet.stake)} | Not: ${bet.note}</div>
                         </div>
                         <button onclick="openSettleModal(${idx})" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-[10px]">Sonuçlandır</button>
                     </div>
@@ -685,18 +656,18 @@ HTML_TEMPLATE = """
         function renderSettled() {
             const container = document.getElementById('settledList');
             if (settledBets.length === 0) {
-                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Sonuçlanan bahis bulunmuyor.</div>';
+                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Sonuçlanan surebet bulunmuyor.</div>';
                 return;
             }
             container.innerHTML = settledBets.map((bet, idx) => `
                 <div onclick="openDetailModal(${idx})" class="p-3 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center text-xs cursor-pointer hover:bg-slate-800/80 transition">
                     <div>
                         <div class="font-bold text-white">${bet.title}</div>
-                        <div class="text-[10px] text-slate-400">Kazanan: <span class="text-blue-400 font-bold">${bet.winner}</span></div>
+                        <div class="text-[10px] text-slate-400">Sonuç: <span class="text-blue-400 font-bold">${bet.winner}</span></div>
                     </div>
                     <div class="text-right">
                         <div class="${bet.net >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-extrabold">${bet.net >= 0 ? '+' : ''}${fmt(bet.net)}</div>
-                        <div class="text-[9px] text-slate-500">Düzenle / Geri Al ➔</div>
+                        <div class="text-[9px] text-slate-500">Yönet / Geri Al ➔</div>
                     </div>
                 </div>
             `).join('');
@@ -707,9 +678,9 @@ HTML_TEMPLATE = """
             const bet = pendingBets[idx];
             const select = document.getElementById('settleResultType');
             select.innerHTML = `
-                <option value="b1">${bet.b1} Kazandı (Oran: ${bet.o1})</option>
-                <option value="b2">${bet.b2} Kazandı (Oran: ${bet.o2})</option>
-                <option value="lost">Komple Kayıp (Lost)</option>
+                <option value="b1">${bet.b1} Kazandı (Alınacak: ${fmt(bet.s1 * bet.o1)})</option>
+                <option value="b2">${bet.b2} Kazandı (Alınacak: ${fmt(bet.s2 * bet.o2)})</option>
+                <option value="lost">Her İki Taraf Da Kaybetti (Lost)</option>
             `;
             document.getElementById('settleModal').classList.remove('hidden');
         }
@@ -731,9 +702,16 @@ HTML_TEMPLATE = """
             let net = 0;
             let winnerName = '';
 
-            if (res === 'b1') { net = (bet.s1 * bet.o1) - bet.stake; winnerName = bet.b1; }
-            else if (res === 'b2') { net = (bet.s2 * bet.o2) - bet.stake; winnerName = bet.b2; }
-            else { net = -bet.stake; winnerName = 'Kayıp'; }
+            if (res === 'b1') { 
+                net = (bet.s1 * bet.o1) - bet.stake; 
+                winnerName = `${bet.b1} Kazandı`; 
+            } else if (res === 'b2') { 
+                net = (bet.s2 * bet.o2) - bet.stake; 
+                winnerName = `${bet.b2} Kazandı`; 
+            } else { 
+                net = -bet.stake; 
+                winnerName = 'Komple Kayıp'; 
+            }
 
             if (bonusTaken === 'evet' && bonusVal > 0) {
                 state.bonus += bonusVal;
@@ -742,7 +720,11 @@ HTML_TEMPLATE = """
 
             state.balance += net;
             state.netProfit += net;
-            if (net > 0) state.dailyProfit += net;
+            if (net > 0) {
+                state.dailyProfit += net;
+                state.weeklyProfit += net;
+                state.monthlyProfit += net;
+            }
 
             settledBets.push({
                 title: bet.title, b1: bet.b1, b2: bet.b2,
@@ -761,11 +743,12 @@ HTML_TEMPLATE = """
             const b = settledBets[idx];
             document.getElementById('detailContent').innerHTML = `
                 <div class="flex justify-between border-b border-slate-800 pb-1"><span>Maç:</span> <strong class="text-white">${b.title}</strong></div>
-                <div class="flex justify-between border-b border-slate-800 pb-1"><span>1. Büro & Stake:</span> <span>${b.b1} (${b.o1}) - ${fmt(b.s1)}</span></div>
-                <div class="flex justify-between border-b border-slate-800 pb-1"><span>2. Büro & Stake:</span> <span>${b.b2} (${b.o2}) - ${fmt(b.s2)}</span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>1. Büro Stake:</span> <span>${b.b1} (${b.o1}) - ${fmt(b.s1)}</span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>2. Büro Stake:</span> <span>${b.b2} (${b.o2}) - ${fmt(b.s2)}</span></div>
                 <div class="flex justify-between border-b border-slate-800 pb-1"><span>Toplam Yatırım:</span> <span>${fmt(b.stake)}</span></div>
-                <div class="flex justify-between border-b border-slate-800 pb-1"><span>Alınan Kayıp Bonusu:</span> <span class="text-blue-400 font-bold">${fmt(b.bonus)}</span></div>
-                <div class="flex justify-between font-bold pt-1"><span>Net Kâr:</span> <span class="${b.net >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${fmt(b.net)}</span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>Kayıp Bonusu:</span> <span class="text-blue-400 font-bold">${fmt(b.bonus)}</span></div>
+                <div class="flex justify-between border-b border-slate-800 pb-1"><span>Sonuç / Kazanan:</span> <span class="text-amber-400 font-bold">${b.winner}</span></div>
+                <div class="flex justify-between font-bold pt-1"><span>Gerçekleşen Net Kâr:</span> <span class="${b.net >= 0 ? 'text-emerald-400' : 'text-rose-400'}">${fmt(b.net)}</span></div>
             `;
             document.getElementById('detailNoteText').value = b.note || '';
             document.getElementById('detailModal').classList.remove('hidden');
@@ -779,6 +762,11 @@ HTML_TEMPLATE = """
                 state.balance -= b.net;
                 state.netProfit -= b.net;
                 state.bonus -= b.bonus;
+                if(b.net > 0) {
+                    state.dailyProfit -= b.net;
+                    state.weeklyProfit -= b.net;
+                    state.monthlyProfit -= b.net;
+                }
                 state.risk += b.stake;
 
                 pendingBets.push({
@@ -794,6 +782,23 @@ HTML_TEMPLATE = """
             }
         }
 
+        function deleteSettledBet() {
+            if (currentDetailIndex !== null) {
+                const b = settledBets[currentDetailIndex];
+                state.balance -= b.net;
+                state.netProfit -= b.net;
+                state.bonus -= b.bonus;
+                if(b.net > 0) {
+                    state.dailyProfit -= b.net;
+                    state.weeklyProfit -= b.net;
+                    state.monthlyProfit -= b.net;
+                }
+                settledBets.splice(currentDetailIndex, 1);
+                updateUI();
+                closeDetailModal();
+            }
+        }
+
         function saveDetailNote() {
             if (currentDetailIndex !== null) {
                 settledBets[currentDetailIndex].note = document.getElementById('detailNoteText').value;
@@ -802,65 +807,11 @@ HTML_TEMPLATE = """
             closeDetailModal();
         }
 
-        function addRolloverTracker() {
-            const name = document.getElementById('rollName').value || 'Özel Bonus';
-            const bonus = parseFloat(document.getElementById('rollBonus').value) || 0;
-            const mult = parseFloat(document.getElementById('rollMultiplier').value) || 1;
-            const done = parseFloat(document.getElementById('rollDone').value) || 0;
-
-            if (bonus <= 0) return;
-
-            rollovers.push({ name, bonus, mult, done, target: bonus * mult });
-            document.getElementById('rollName').value = '';
-            document.getElementById('rollBonus').value = '';
-            document.getElementById('rollMultiplier').value = '';
-            document.getElementById('rollDone').value = '';
-            renderRollovers();
-        }
-
-        function renderRollovers() {
-            const container = document.getElementById('rolloverList');
-            if (rollovers.length === 0) {
-                container.innerHTML = '<div class="text-xs text-slate-500 text-center py-2">Çevrim takibi bulunmuyor.</div>';
-                return;
-            }
-            container.innerHTML = rollovers.map((r, idx) => {
-                const pct = Math.min(100, (r.done / r.target) * 100);
-                return `
-                    <div class="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="font-bold text-white">${r.name}</span>
-                            <span class="text-blue-400 font-bold">%${pct.toFixed(1)}</span>
-                        </div>
-                        <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-indigo-500 rounded-full" style="width: ${pct}%;"></div>
-                        </div>
-                        <div class="flex justify-between text-[10px] text-slate-400">
-                            <span>Çevrilen: ${fmt(r.done)}</span>
-                            <span>Hedef: ${fmt(r.target)} (${r.mult}x)</span>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function recalcConverter() {
-            const amt = parseFloat(document.getElementById('convAmount').value) || 0;
-            const from = document.getElementById('convFrom').value;
-            const to = document.getElementById('convTo').value;
-
-            const rates = { TRY: 1, USD: 0.0294, EUR: 0.0270 };
-            const inTRY = amt / rates[from];
-            const res = inTRY * rates[to];
-
-            document.getElementById('convResult').innerText = `${amt} ${from} = ${res.toFixed(2)} ${to}`;
-        }
-
         function confirmResetAll() {
             if (confirm("Tüm kasayı, bahisleri ve verileri sıfırlamak istediğinize emin misiniz?")) {
-                state = { balance: 10000, startBalance: 10000, goal: 20000, risk: 0, netProfit: 0, bonus: 0, currency: 'TRY', dailyProfit: 0 };
+                state = { balance: 10000, startBalance: 10000, goal: 20000, risk: 0, netProfit: 0, bonus: 0, currency: 'TRY', dailyProfit: 0, weeklyProfit: 0, monthlyProfit: 0 };
                 bookies = [{ name: 'Bet365', balance: 5000 }, { name: '1xBet', balance: 5000 }];
-                pendingBets = []; settledBets = []; rollovers = [];
+                pendingBets = []; settledBets = [];
                 updateUI();
                 alert("Tüm veriler sıfırlandı!");
             }
@@ -885,7 +836,7 @@ HTML_TEMPLATE = """
             document.getElementById('bodyRoot').className = `${theme} pb-36 p-3 max-w-lg mx-auto space-y-4`;
         }
 
-        function exportData(type) { alert(`Veriler ${type.toUpperCase()} formatında aktarılıyor...`); }
+        function exportData(type) { alert(`Veriler ${type.toUpperCase()} formatında indiriliyor...`); }
 
         window.onload = function() { updateUI(); recalcArb(); };
     </script>
